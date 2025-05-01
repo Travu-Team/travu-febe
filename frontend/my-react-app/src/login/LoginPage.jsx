@@ -2,14 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // ✅ Tambahkan navigasi
 import "../index.css";
 
-const RegisterPage = () => {
+const LoginPage = () => {
   const navigate = useNavigate(); // ✅ Gunakan navigasi
 
   const [formData, setFormData] = useState({
-    nama: "",
     email: "",
     password: "",
-    confirmPassword: "",
     rememberMe: false,
   });
 
@@ -21,22 +19,18 @@ const RegisterPage = () => {
   return (
     <div className="flex h-screen w-screen items-center justify-center relative">
       {/* Background Gambar */}
-      <div className="flex-1 h-screen bg-cover bg-center bg-no-repeat p-12" style={{ backgroundImage: "url('/image/background-register.jpg')" }} />
+      <div className="flex-1 h-screen bg-cover bg-center bg-no-repeat p-12" style={{ backgroundImage: "url('/image/background-login.jpg')" }} />
 
       {/* Bagian Form */}
       <div className="flex-1 h-screen flex flex-col justify-center items-center p-12 bg-white shadow-lg rounded-lg">
         <h2 className="text-center text-3xl font-semibold text-gray-900">
-          Selamat datang di <span className="text-blue-600">Travu</span>
+          Masuk ke <span className="text-blue-600">Travu</span>
         </h2>
 
         <form className="w-full max-w-md flex flex-col gap-6">
-          {["nama", "email"].map((field) => (
-            <input key={field} type={field === "email" ? "email" : "text"} name={field} placeholder={field.charAt(0).toUpperCase() + field.slice(1)} value={formData[field]} onChange={handleChange} className="p-4 rounded-lg border border-gray-400 w-full text-lg bg-gray-100 outline-none" />
-          ))}
+          <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="p-4 rounded-lg border border-gray-400 w-full text-lg bg-gray-100 outline-none" />
 
-          {["password", "confirmPassword"].map((field) => (
-            <input key={field} type="password" name={field} placeholder={field === "confirmPassword" ? "Konfirmasi Kata Sandi" : "Kata Sandi"} value={formData[field]} onChange={handleChange} className="p-4 rounded-lg border border-gray-400 w-full text-lg bg-gray-100 outline-none" />
-          ))}
+          <input type="password" name="password" placeholder="Kata Sandi" value={formData.password} onChange={handleChange} className="p-4 rounded-lg border border-gray-400 w-full text-lg bg-gray-100 outline-none" />
 
           <label className="flex items-center gap-4 text-lg cursor-pointer">
             <input type="checkbox" name="rememberMe" checked={formData.rememberMe} onChange={handleChange} />
@@ -44,14 +38,16 @@ const RegisterPage = () => {
           </label>
 
           <button type="submit" className="p-4 bg-blue-600 text-white rounded-lg text-xl font-semibold w-full transition duration-300 hover:bg-blue-700">
-            Daftar
+            Masuk
           </button>
         </form>
 
+
+        {/* ✅ Perbaiki navigasi */}
         <p className="mt-6 text-lg text-gray-900">
-          Sudah Punya Akun?{" "}
-          <span className="text-blue-600 font-semibold cursor-pointer" onClick={() => navigate("/login")}>
-            Masuk Disini
+          Belum Punya Akun?{" "}
+          <span className="text-blue-600 font-semibold cursor-pointer" onClick={() => navigate("/register")}>
+            Daftar Disini
           </span>
         </p>
       </div>
@@ -59,4 +55,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default LoginPage;

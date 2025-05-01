@@ -1,11 +1,17 @@
 import React from "react";
-import RegisterPage from "./register/RegisterPage.jsx";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import RegisterPage from "./register/RegisterPage";
+import LoginPage from "./login/LoginPage";
 
 const App = () => {
   return (
-    <div>
-      <RegisterPage />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<RegisterPage />} /> {/* Default halaman */}
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
+    </Router>
   );
 };
 
