@@ -54,6 +54,13 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* STYLING ABOUT */
+.about-image {
+  background-image: linear-gradient(270deg, rgba(0, 0, 0, 0) 39%, rgba(0, 0, 0, 0.60) 70%),
+    url(./assets/img/img-about.png);
+}
+
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
