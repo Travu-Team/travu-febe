@@ -5,10 +5,6 @@ import LoginPage from "./login/LoginPage";
 import Home from './pages/Home'
 import About from './pages/About'
 
-// testing button
-import PrimaryButton from "./components/Button";
-
-
 const App = () => {
   return (
     <Router>
@@ -18,9 +14,6 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/about" element={<About />} />
         <Route path="*" element={<h1>404: Not Found</h1>} />
-
-        {/* testing button */}
-        <Route path="/primarybutton" element={<PrimaryButton />} />
       </Routes>
     </Router>
   );

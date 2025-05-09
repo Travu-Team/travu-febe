@@ -1,15 +1,8 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import PrimaryButton from '../components/Button';
 
 const Home = () => {
-  const handleAksiClick = () => {
-    console.log('Tombol Aksi diklik dari Home!');
-    // Tambahkan logika aksi yang Anda inginkan di sini
-  };
-
-
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       <Navbar />
@@ -34,7 +27,6 @@ const Home = () => {
               </a>
             </div>
           </div>
-
           {/* Right Image */}
           <div className="w-full md:w-1/2 flex justify-center">
             <img
@@ -45,14 +37,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      {/* testing button */}
-      <div className="flex justify-center md:justify-start space-x-4">
-        <PrimaryButton type="button" onClick={handleAksiClick}>
-          Lihat Selengkapnya
-        </PrimaryButton>
-      </div>
-      
       {/* Footer */}
       <Footer />
     </div>
