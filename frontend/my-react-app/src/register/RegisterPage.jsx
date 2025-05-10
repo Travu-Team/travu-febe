@@ -12,6 +12,11 @@ const RegisterPage = () => {
     rememberMe: false,
   });
 
+  const [showPassword, setShowPassword] = useState({
+    password: false,
+    confirmPassword: false,
+  });
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -20,93 +25,62 @@ const RegisterPage = () => {
     });
   };
 
+  const togglePasswordVisibility = (field) => {
+    setShowPassword((prevState) => ({
+      ...prevState,
+      [field]: !prevState[field],
+    }));
+  };
+
   return (
-    <div className="flex h-screen w-screen">
+    <div className="relative h-screen w-screen">
       {/* Background Gambar */}
       <div
-        className="w-1/2 h-full bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: "url('/image/background-register.jpg')" }}
       />
 
       {/* Form Section */}
-      <div className="w-1/2 h-full flex items-center justify-center p-16 bg-white shadow-lg">
-        <div className="max-w-md w-full space-y-8">
+      <div className="relative flex items-center justify-center h-full w-full px-6">
+        <div className="max-w-md w-full bg-white bg-opacity-90 p-6 rounded-lg shadow-lg">
           {/* Judul */}
           <h2 className="text-3xl font-semibold text-center text-gray-900">
-            Selamat Datang di{" "}
-            <span className="text-blue-600">Travu</span>
+            Selamat Datang di <span className="text-blue-600">Travu</span>
           </h2>
-
-          {/* Subjudul */}
-          <p className="text-sm text-center text-gray-500">
-            Silakan daftar untuk melanjutkan
-          </p>
 
           {/* Form */}
           <form className="space-y-6">
-            {/* Nama Lengkap */}
-            <div>
-              <label htmlFor="nama" className="block text-sm font-medium text-gray-700 mb-1">
-                Nama Lengkap
-              </label>
+            {["nama", "email"].map((field) => (
               <input
-                id="nama"
-                type="text"
-                name="nama"
-                placeholder="Masukkan nama lengkap"
-                value={formData.nama}
+                key={field}
+                type={field === "email" ? "email" : "text"}
+                name={field}
+                placeholder={`Masukkan ${field}`}
+                value={formData[field]}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                className="w-full p-3 border rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-gray-50 shadow-sm text-black"
               />
-            </div>
+            ))}
 
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                name="email"
-                placeholder="Masukkan email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-              />
-            </div>
-
-            {/* Kata Sandi */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Kata Sandi
-              </label>
-              <input
-                id="password"
-                type="password"
-                name="password"
-                placeholder="Masukkan kata sandi"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-              />
-            </div>
-
-            {/* Konfirmasi Kata Sandi */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Konfirmasi Kata Sandi
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                name="confirmPassword"
-                placeholder="Konfirmasi kata sandi"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-              />
-            </div>
+            {["password", "confirmPassword"].map((field) => (
+              <div key={field} className="relative">
+                <input
+                  type={showPassword[field] ? "text" : "password"}
+                  name={field}
+                  placeholder={field === "confirmPassword" ? "Konfirmasi Kata Sandi" : "Kata Sandi"}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-gray-50 shadow-sm text-black"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 text-gray-600"
+                  onClick={() => togglePasswordVisibility(field)}
+                >
+                  {showPassword[field] ? "🙈" : "👁"}
+                </button>
+              </div>
+            ))}
 
             {/* Ingat Saya */}
             <label className="flex items-center gap-2 cursor-pointer">
@@ -130,7 +104,7 @@ const RegisterPage = () => {
           </form>
 
           {/* Link Login */}
-          <p className="text-center text-sm text-gray-600">
+          <p className="text-center text-sm text-gray-600 mt-4">
             Sudah Punya Akun?{" "}
             <span
               onClick={() => navigate("/login")}

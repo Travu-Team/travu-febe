@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false,
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -18,55 +20,55 @@ const LoginPage = () => {
     });
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <div className="flex h-screen w-screen">
+    <div className="relative h-screen w-screen">
       {/* Background Gambar */}
       <div
-        className="w-1/2 h-full bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: "url('/image/background-login.jpg')" }}
       />
 
       {/* Form Section */}
-      <div className="w-1/2 h-full flex items-center justify-center p-16 bg-white shadow-lg">
-        <div className="max-w-md w-full space-y-8">
+      <div className="relative flex items-center justify-center h-full w-full px-6">
+        <div className="max-w-md w-full bg-white bg-opacity-90 p-6 rounded-lg shadow-lg">
           {/* Judul */}
           <h2 className="text-3xl font-semibold text-center text-gray-900">
-            Masuk ke{" "}
-            <span className="text-blue-600">Travu</span>
+            Selamat datang kembali di <span className="text-blue-600">Travu</span>
           </h2>
 
           {/* Form */}
           <form className="space-y-6">
-            {/* Email Input */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                name="email"
-                placeholder="Masukkan email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-              />
-            </div>
+            {/* Input Email */}
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full p-3 border rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-black shadow-sm"
+            />
 
-            {/* Password Input */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Kata Sandi
-              </label>
+            {/* Input Password */}
+            <div className="relative">
               <input
-                id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="Masukkan kata sandi"
+                placeholder="Kata Sandi"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                className="w-full p-3 border rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-black shadow-sm"
               />
+              <button
+                type="button"
+                className="absolute right-3 text-gray-600"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? "🙈" : "👁"}
+              </button>
             </div>
 
             {/* Ingat Saya & Lupa Kata Sandi */}
@@ -96,7 +98,7 @@ const LoginPage = () => {
           </form>
 
           {/* Link Daftar */}
-          <p className="text-center text-sm text-gray-600">
+          <p className="text-center text-sm text-gray-600 mt-4">
             Belum Punya Akun?{" "}
             <span
               onClick={() => navigate("/register")}
