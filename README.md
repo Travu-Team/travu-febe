@@ -5,13 +5,13 @@ NOTE: HARAP DIPERHATIKAN UNTUK SELALU PULL REPOSITORY TERLEBIH DAHULU SEBELUM ME
 ## FRONT-END
 - [ ] Homepage (Tyo)
 - [ ] Travel Details/Detail Wisata
-- [ ] Destination Plan 2/Rencana Wisata 2
-- [ ] Profile Users
-- [ ] Search
+- [ ] Destination Plan 2/Rencana Wisata 2 (Luthfi)
+- [ ] Profile Users (Luthfi)
+- [ ] Search Page (Tyo)
 - [ ] Destination Plan 1/Rencana Wisata 1
 - [ ] Login & Register (Yunas)
-- [ ] About (Luthfi)
-- [ ] Components: Navbar & Footer (Tyo), Button & Cards (Luthfi)
+- [x] About (Luthfi)
+- [x] Components: Navbar & Footer (Tyo), Button & Cards (Luthfi)
 
 ## BACK-END
 - [ ] 
