@@ -4,10 +4,8 @@ import RegisterPage from "./register/RegisterPage";
 import LoginPage from "./login/LoginPage";
 import Home from './pages/Home'
 import About from './pages/About'
-import { CardCustom } from './components/Cards'
-// import { CardDefault } from './components/Cards'
+import ProfileUser from "./pages/ProfileUser";
 
-// testing card
 
 const App = () => {
   return (
@@ -17,11 +15,9 @@ const App = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/about" element={<About />} />
+        <Route path="/profile" element={<ProfileUser />} />
         <Route path="*" element={<h1>404: Not Found</h1>} />
 
-        {/* testing card */}
-        <Route path="/card" element={<CardCustom />} />
-        {/* <Route path="/carddefault" element={<CardDefault />} /> */}
       </Routes>
     </Router>
   );
