@@ -13,19 +13,19 @@ const Footer = () => {
         </p>
 
         <div className="flex space-x-4">
-          <a href="#" className="text-indigo-500 hover:text-indigo-700">
+          <a href="#" className="text-primary hover:text-primary">
             <FontAwesomeIcon icon={faFacebook} size="lg" />
           </a>
-          <a href="#" className="text-indigo-500 hover:text-indigo-700">
+          <a href="#" className="text-primary hover:text-primary">
             <FontAwesomeIcon icon={faInstagram} size="lg" />
           </a>
-          <a href="#" className="text-indigo-500 hover:text-indigo-700">
+          <a href="#" className="text-primary hover:text-primary">
             <FontAwesomeIcon icon={faTwitter} size="lg" />
           </a>
         </div>
       </div>
 
-      <div className="bg-indigo-500 text-white text-center py-4 mt-8 w-full">
+      <div className="bg-primary text-white text-center py-4 mt-8 w-full">
         <p>©Travu. Hak Cipta 2025</p>
       </div>
     </footer>
