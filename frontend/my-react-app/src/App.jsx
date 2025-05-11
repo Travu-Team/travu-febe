@@ -6,6 +6,8 @@ import Home from "./pages/Home";
 import Destinasi from "./pages/destinasi/detail-page";
 import About from "./pages/About";
 import ProfileUser from "./pages/ProfileUser";
+import TravelPlan from "./pages/plan/travel-plan"
+import ForgotPassword from "./utils/lupa-sandi";
 
 const App = () => {
   return (
@@ -17,6 +19,8 @@ const App = () => {
         <Route path="/destinasi/:placeName" element={<Destinasi />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<ProfileUser />} />
+        <Route path="/plan" element={<TravelPlan />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="*" element={<h1 className="text-center text-red-600 text-3xl mt-10">404: Not Found</h1>} />
       </Routes>
     </Router>

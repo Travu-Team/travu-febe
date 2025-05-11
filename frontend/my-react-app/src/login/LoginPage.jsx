@@ -11,6 +11,7 @@ const LoginPage = () => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -22,6 +23,32 @@ const LoginPage = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+
+    try {
+      const response = await fetch("https://api.example.com/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+        navigate("/profile");
+      } else {
+        setErrorMessage(data.message || "Login gagal, periksa kembali email dan password.");
+      }
+    } catch (error) {
+      setErrorMessage("Terjadi kesalahan saat menghubungi server.");
+    }
   };
 
   return (
@@ -40,8 +67,11 @@ const LoginPage = () => {
             Selamat datang kembali di <span className="text-blue-600">Travu</span>
           </h2>
 
+          {/* Pesan Kesalahan */}
+          {errorMessage && <p className="text-red-500 text-sm text-center mt-2">{errorMessage}</p>}
+
           {/* Form */}
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Input Email */}
             <input
               type="email"
@@ -50,6 +80,7 @@ const LoginPage = () => {
               value={formData.email}
               onChange={handleChange}
               className="w-full p-3 border rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-black shadow-sm"
+              required
             />
 
             {/* Input Password */}
@@ -61,6 +92,7 @@ const LoginPage = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full p-3 border rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-black shadow-sm"
+                required
               />
               <button
                 type="button"
@@ -83,9 +115,12 @@ const LoginPage = () => {
                 />
                 <span className="text-sm text-gray-700">Ingat Saya</span>
               </label>
-              <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800">
+              <span
+                onClick={() => navigate("/forgot-password")}
+                className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
+              >
                 Lupa Kata Sandi?
-              </a>
+              </span>
             </div>
 
             {/* Tombol Login */}
