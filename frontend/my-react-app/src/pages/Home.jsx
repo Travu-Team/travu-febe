@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { CardCustom } from '../components/Cards';
-import { IconButtonCustom } from '../components/icon-button';
+import { IconButtonCustom } from '../components/IconButton';
 import { StarIcon } from '@heroicons/react/24/solid';
 
 const Home = () => {

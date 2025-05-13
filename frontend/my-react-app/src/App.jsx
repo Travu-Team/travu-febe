@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import RegisterPage from "./register/RegisterPage";
 import LoginPage from "./login/LoginPage";
 import Home from "./pages/Home";
-import Destinasi from "./pages/destinasi/detail-page";
+import Destinasi from "./pages/destinasi/DetailPage";
 import About from "./pages/About";
 import ProfileUser from "./pages/ProfileUser";
-import TravelPlan from "./pages/plan/travel-plan"
-import ForgotPassword from "./utils/lupa-sandi";
+import TravelPlan from "./pages/plan/TravelPlan"
+import ForgotPassword from "./utils/LupaSandi";
 
 const App = () => {
   return (

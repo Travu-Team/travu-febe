@@ -1,5 +1,5 @@
 import React from "react";
-import { IconButtonCustom } from "./icon-button";
+import { IconButtonCustom } from "./IconButton";
 import { MapPinIcon, StarIcon } from "@heroicons/react/24/solid";
 import ButtonCustom from "./Button";
 import {

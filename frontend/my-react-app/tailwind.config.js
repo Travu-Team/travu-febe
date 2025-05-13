@@ -4,6 +4,14 @@ const withMT = require("@material-tailwind/react/utils/withMT");
 module.exports = withMT({
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: { extend: {
+// Detail Ukuran Layar
+    screens: {
+      'xs': {'max': '639px'},     // Mobile (max-width: 639px)
+      'sm': {'min': '640px', 'max': '767px'},     // Tablet (min-width: 640px)
+      'md': {'min': '768px', 'max': '1023px'},    // Laptop (min-width: 768px)
+      'lg': {'min': '1024px', 'max': '1279px'},   // Desktop (min-width: 1024px)
+      'xl': {'min': '1280px'},    // Large Desktop (min-width: 1280px)
+    },
     colors: {
       black: 'rgba(15, 15, 15, 1)',
       grey: 'rgba(162, 162, 162, 1)',
