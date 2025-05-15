@@ -8,8 +8,8 @@ NOTE: HARAP DIPERHATIKAN UNTUK SELALU PULL REPOSITORY TERLEBIH DAHULU SEBELUM ME
 - [ ] Destination Plan 2/Rencana Wisata 2 (Luthfi)
 - [ ] Profile Users (Luthfi)
 - [ ] Search Page (Tyo)
-- [ ] Destination Plan 1/Rencana Wisata 1
-- [ ] Login & Register (Yunas)
+- [x] Destination Plan 1/Rencana Wisata 1
+- [x] Login & Register (Yunas)
 - [x] About (Luthfi)
 - [x] Components: Navbar & Footer (Tyo), Button & Cards (Luthfi)
 
