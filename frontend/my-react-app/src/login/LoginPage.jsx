@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../services/authService";
 import "../index.css";
 
 const LoginPage = () => {
@@ -24,24 +25,19 @@ const LoginPage = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
     try {
-      const response = await fetch("https://api.example.com/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      const response = await authService.login({
+        email: formData.email,
+        password: formData.password,
+        rememberMe: formData.rememberMe
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem("token", data.token);
+      if (response.token) {
+        // Token akan disimpan oleh authService berdasarkan rememberMe
         navigate("/profile");
       } else {
         setErrorMessage(data.message || "Login gagal, periksa kembali email dan password.");
@@ -71,7 +67,7 @@ const LoginPage = () => {
           {errorMessage && <p className="text-red-500 text-sm text-center mt-2">{errorMessage}</p>}
 
           {/* Form */}
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6 mt-4" onSubmit={handleSubmit}>
             {/* Input Email */}
             <input
               type="email"

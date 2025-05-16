@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../services/authService";
 import "../index.css";
 
 const RegisterPage = () => {
@@ -10,12 +11,16 @@ const RegisterPage = () => {
     password: "",
     confirmPassword: "",
     rememberMe: false,
+
   });
 
   const [showPassword, setShowPassword] = useState({
     password: false,
     confirmPassword: false,
   });
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false); 
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -30,6 +35,44 @@ const RegisterPage = () => {
       ...prevState,
       [field]: !prevState[field],
     }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess(false);
+
+    // Validasi form
+    if (!formData.nama || !formData.email || !formData.password || !formData.confirmPassword) {
+      setError("Semua field harus diisi.");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Kata sandi dan konfirmasi kata sandi tidak cocok.");
+      return;
+    }    try {
+      const response = await authService.register({
+        nama: formData.nama,
+        email: formData.email,
+        password: formData.password,
+        rememberMe: formData.rememberMe
+      });
+
+      if (response.token) {
+        // Token akan otomatis disimpan oleh authService dengan preferensi rememberMe
+        authService.saveToken(response.token, formData.rememberMe);
+      }
+
+      // Set success dan tunggu 2detik sebelum redirect
+      setSuccess(true);
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (err) {
+      setError(err.message || "Terjadi kesalahan. Silakan coba lagi.");
+      console.error("Error during registration:", err);
+    }
   };
 
   return (
@@ -48,8 +91,23 @@ const RegisterPage = () => {
             Selamat Datang di <span className="text-blue-600">Travu</span>
           </h2>
 
+{/* Pesan sukses & Pesan error ketika delay menuju ke laman login */}
+          {/* Pesan sukses */}
+          {success && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4">
+              Registrasi berhasil! Mengalihkan ke halaman login...
+            </div>
+          )}
+
+          {/* Pesan error */}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4">
+              {error}
+            </div>
+          )}
+
           {/* Form */}
-          <form className="space-y-6">
+          <form className="space-y-6 mt-4" onSubmit={handleSubmit}>
             {["nama", "email"].map((field) => (
               <input
                 key={field}
@@ -74,8 +132,8 @@ const RegisterPage = () => {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 text-gray-600"
                   onClick={() => togglePasswordVisibility(field)}
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 text-xl"
                 >
                   {showPassword[field] ? "🙈" : "👁"}
                 </button>
