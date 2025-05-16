@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import { UserCircleIcon } from "@heroicons/react/24/solid";
+import 'react-toastify/dist/ReactToastify.css';
 import ButtonCustom from '../components/Button';
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 const InputField = ({ id, label, value, onChange, type = 'text', disabled = false }) => (
   <div className="mb-4">
-    <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
+    <label htmlFor={id} className="block text-gray-700 font-semibold mb-2">
       {label}
     </label>
     <input
@@ -25,14 +29,16 @@ const ProfileUser = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [userData, setUserData] = useState({
-    name: '',
+    nama: '',
     phoneNumber: '',
     email: '',
     address: '',
     interest: ''
   });
+  const [originalData, setOriginalData] = useState(null);
 
-  // Fetch user data when component mounts
+  const navigate = useNavigate();
+  // Mengambil data user ketika komponen dimuat
   useEffect(() => {
     fetchUserData();
   }, []);
@@ -43,22 +49,21 @@ const ProfileUser = () => {
       const response = await fetch('http://localhost:5000/api/user/profile', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // Assuming you store JWT token in localStorage
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Mengambil token JWT dari localStorage
         }
-      });
-
+      });      
       if (!response.ok) {
-        throw new Error('Failed to fetch user data');
+        throw new Error('Gagal mengambil data profil');
       }
-
-      const data = await response.json();
-      setUserData(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        const data = await response.json();
+        setUserData(data);
+        setOriginalData(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -66,78 +71,92 @@ const ProfileUser = () => {
       ...prev,
       [id]: value
     }));
-  };
-
-  const handleSubmit = async (event) => {
+  };  const handleSubmit = async (event) => {
     event.preventDefault();
     
-    try {
-      setIsLoading(true);
-      const response = await fetch('http://localhost:5000/api/user/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(userData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update profile');
-      }
-
-      const updatedData = await response.json();
-      setUserData(updatedData);
-      setIsEditing(false);
-      alert('Profile updated successfully!');
-    } catch (err) {
-      setError(err.message);
-      alert('Failed to update profile: ' + err.message);
-    } finally {
-      setIsLoading(false);
+    // Jika form tidak dalam mode edit, jangan lakukan apa-apa
+    if (!isEditing) {
+      return;
     }
-  };
 
-  const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete your profile?')) {
+    // Memeriksa apakah ada perubahan data
+    const hasChanges = 
+      userData.nama !== originalData?.nama ||
+      userData.phoneNumber !== originalData?.phoneNumber ||
+      userData.address !== originalData?.address ||
+      userData.interest !== originalData?.interest;
+
+    // Jika tidak ada perubahan, kembalikan ke mode view saja
+    if (!hasChanges) {
+      setIsEditing(false);
       return;
     }
 
     try {
       setIsLoading(true);
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setError('Token tidak ditemukan. Silakan login kembali.');
+        navigate('/login');
+        return;
+      }
+
       const response = await fetch('http://localhost:5000/api/user/profile', {
-        method: 'DELETE',
+        method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          nama: userData.nama,
+          phoneNumber: userData.phoneNumber,
+          address: userData.address,
+          interest: userData.interest
+        })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete profile');
-      }
-
-      // Redirect to login page or handle as needed
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Gagal memperbarui profil');
+      }      const updatedData = await response.json();
+      setUserData(updatedData);
+      setIsEditing(false);
+      toast.success('Profil berhasil diperbarui!', {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true
+      });
     } catch (err) {
       setError(err.message);
-      alert('Failed to delete profile: ' + err.message);
+      toast.error('Gagal memperbarui profil: ' + err.message, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="w-full mx-auto min-h-screen flex flex-col">
+      <ToastContainer />        
       <header className="sticky top-0 z-50">
         <Navbar />
       </header>
       
-      <main className="w-full flex-grow container mx-auto px-20 py-8 lg:px-16 md:px-10 sm:px-6 xs:px-4">
+      <main className="w-full flex-grow">
         <section className="mb-8 text-center">
           <h1 className="text-3xl font-md text-black">Selamat Datang</h1>
           <p className="text-xl font-md text-gray-600 mt-2">
-            {isEditing ? 'Edit Profil Anda' : 'Informasi Profil Anda'}
+            {isEditing ? 'Silakan Edit Profil Anda' : 'Di Halaman Informasi Profil'}
           </p>
         </section>
 
@@ -145,31 +164,28 @@ const ProfileUser = () => {
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
             {error}
           </div>
-        )}
-
-        <div className="flex flex-col lg:flex-row gap-12">
-          <aside className="w-full lg:w-1/4">
-            <nav className="bg-secondary/30 p-6 rounded-lg shadow-md h-full">
-              <h2 className="text-xl font-bold mb-6 text-gray-800">Navigasi Profil</h2>
+        )}        
+        <div className="flex flex-row gap-6">
+          <aside className="w-3/4">
+            <div className="bg-secondary/30 p-6 rounded-lg shadow-md h-fit">
+              <h2 className="text-xl font-semibold mb-6 text-gray-800">Navigasi Profil</h2>
               <ul className="space-y-4">
                 <li>
-                  <a href="#" className="flex items-center gap-3 p-3 rounded-lg font-medium">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 8a2 2 0 110-4 2 2 0 010 4zm0 4a2 2 0 110-4 2 2 0 010 4z" />
-                    </svg>
+                  <a href="#" className="flex items-center gap-3 rounded-lg font-medium">
+                    <UserCircleIcon className="h-5 w-5" />
                     Profil Saya
                   </a>
                 </li>
               </ul>
-            </nav>
-          </aside>
-
-          <section className="w-full lg:w-3/4 p-6 bg-white rounded-lg shadow-md">
-            <form onSubmit={handleSubmit}>
+            </div>          
+            </aside>            
+            
+            <section className="border border-gray-400 w-full p-6 bg-white rounded-lg shadow-md">
+            <form onSubmit={handleSubmit} className="w-full mr-60">
               <InputField
-                id="name"
+                id="nama"
                 label="Nama Lengkap"
-                value={userData.name}
+                value={userData.nama}
                 onChange={handleInputChange}
                 disabled={!isEditing}
               />
@@ -202,34 +218,45 @@ const ProfileUser = () => {
                 value={userData.interest}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-              />
-
-              <div className="flex gap-4 mt-6">
+              />                <div className="flex gap-4 mt-6 justify-start w-full">
                 {!isEditing ? (
-                  <ButtonCustom type="button" onClick={() => setIsEditing(true)}>
+                  <ButtonCustom 
+                    type="button" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsEditing(true);
+                    }}
+                  >
                     Edit Profil
                   </ButtonCustom>
                 ) : (
                   <>
-                    <ButtonCustom type="submit" disabled={isLoading}>
+                    <ButtonCustom 
+                      type="submit" 
+                      disabled={isLoading}
+                      onClick={(e) => {
+                        if (!isEditing) {
+                          e.preventDefault();
+                          return;
+                        }
+                      }}
+                    >
                       {isLoading ? 'Menyimpan...' : 'Simpan'}
                     </ButtonCustom>
                     <ButtonCustom
-                      type="button"
-                      onClick={() => setIsEditing(false)}
+                      type="cancel"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsEditing(false);
+                        // Reset form ke data awal
+                        fetchUserData();
+                      }}
                       className="bg-gray-500 hover:bg-gray-600"
                     >
                       Batal
                     </ButtonCustom>
                   </>
                 )}
-                <ButtonCustom
-                  type="button"
-                  onClick={handleDelete}
-                  className="bg-red-500 hover:bg-red-600 ml-auto"
-                >
-                  Hapus Akun
-                </ButtonCustom>
               </div>
             </form>
           </section>
