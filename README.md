@@ -4,9 +4,9 @@ NOTE: HARAP DIPERHATIKAN UNTUK SELALU PULL REPOSITORY TERLEBIH DAHULU SEBELUM ME
 
 ## FRONT-END
 - [ ] Homepage (Tyo)
-- [ ] Travel Details/Detail Wisata
+- [x] Travel Details/Detail Wisata (Yunas)
 - [ ] Destination Plan 2/Rencana Wisata 2 (Luthfi)
-- [ ] Profile Users (Luthfi)
+- [x] Profile Users (Luthfi)
 - [ ] Search Page (Tyo)
 - [x] Destination Plan 1/Rencana Wisata 1
 - [x] Login & Register (Yunas)
@@ -14,7 +14,9 @@ NOTE: HARAP DIPERHATIKAN UNTUK SELALU PULL REPOSITORY TERLEBIH DAHULU SEBELUM ME
 - [x] Components: Navbar & Footer (Tyo), Button & Cards (Luthfi)
 
 ## BACK-END
-- [ ] 
+- [x] Autentikasi Login & Register (Yunas & Luthfi)
+- [x] CRUD laman profile user (Luthfi)
+- [ ] CRUD laman travel details
 
 ## HOW TO CLONE REPOSITORY
 
