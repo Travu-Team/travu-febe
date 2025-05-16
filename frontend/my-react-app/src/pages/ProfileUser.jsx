@@ -242,7 +242,7 @@ const ProfileUser = () => {
                       }}
                     >
                       {isLoading ? 'Menyimpan...' : 'Simpan'}
-                    </ButtonCustom>
+                    </ButtonCustom>                    
                     <ButtonCustom
                       type="cancel"
                       onClick={(e) => {
@@ -251,7 +251,7 @@ const ProfileUser = () => {
                         // Reset form ke data awal
                         fetchUserData();
                       }}
-                      className="bg-gray-500 hover:bg-gray-600"
+                      className="bg-red-500 hover:bg-red-600"
                     >
                       Batal
                     </ButtonCustom>
