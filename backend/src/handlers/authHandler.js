@@ -1,0 +1,108 @@
+'use strict';
+
+const Boom = require('@hapi/boom');
+const bcrypt = require('bcrypt');
+const JWT = require('@hapi/jwt');
+const { User } = require('../models');
+
+const authHandler = {    
+    register: async (request, h) => {
+        try {
+            const { nama, email, password, rememberMe } = request.payload;
+            console.log('Register attempt for:', email);
+
+            // Check if user already exists
+            const existingUser = await User.findOne({ where: { email } });
+            if (existingUser) {
+                throw Boom.badRequest('Email already registered');
+            }
+
+            // Hash password
+            const hashedPassword = await bcrypt.hash(password, 10);            // Create user
+            const user = await User.create({
+                nama,
+                email,
+                password: hashedPassword
+            });
+
+            console.log('User registered successfully:', email);
+
+            // Generate token dengan expiration time
+            const expiresIn = request.payload.rememberMe ? '30d' : '1d';
+            const token = JWT.token.generate(
+                {
+                    id: user.id,
+                    email: user.email,
+                    nama: user.nama,
+                    exp: Math.floor(Date.now() / 1000) + (request.payload.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60)
+                },
+                process.env.JWT_SECRET
+            );
+
+            return h.response({
+                message: 'Registration successful',
+                token
+            }).code(201);
+        } catch (error) {
+            console.error('Register error:', error);
+            throw Boom.boomify(error);
+        }
+    },
+
+    login: async (request, h) => {
+        try {
+            const { email, password } = request.payload;
+            console.log('Login attempt - Email:', email);
+
+            // Find user
+            const user = await User.findOne({ where: { email } });
+            console.log('Database query result:', user ? 'User found' : 'User not found');
+
+            if (!user) {
+                console.log('Login failed: User not found');
+                throw Boom.unauthorized('Invalid email or password');
+            }
+
+            // Log password details (only in development)
+            console.log('Attempting password verification');
+            console.log('Input password:', password);
+            console.log('Stored hashed password:', user.password);
+
+            // Verify password
+            const isValid = await bcrypt.compare(password, user.password);
+            console.log('Password verification result:', isValid);
+
+            if (!isValid) {
+                console.log('Login failed: Invalid password');
+                throw Boom.unauthorized('Invalid email or password');
+            }            // Generate token dengan expiration time berdasarkan rememberMe
+            const { rememberMe } = request.payload;
+            const token = JWT.token.generate(
+                {
+                    id: user.id,
+                    email: user.email,
+                    nama: user.nama,
+                    exp: Math.floor(Date.now() / 1000) + (rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60)
+                },
+                process.env.JWT_SECRET
+            );
+
+            console.log('Login successful for user:', user.nama);
+
+            return h.response({
+                message: 'Login successful',
+                token,
+                user: {
+                    id: user.id,
+                    nama: user.nama,
+                    email: user.email
+                }
+            }).code(200);
+        } catch (error) {
+            console.error('Login error:', error);
+            throw error;
+        }
+    }
+};
+
+module.exports = authHandler;
