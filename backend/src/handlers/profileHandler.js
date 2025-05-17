@@ -8,17 +8,22 @@ const profileHandler = {
   getProfile: async (request, h) => {
     try {
       const userId = request.auth.credentials.id;
+      console.log('Getting profile for user ID:', userId);
+
       const user = await User.findByPk(userId, {
-        attributes: ['id', 'name', 'email', 'phoneNumber', 'address', 'interest']
+        attributes: ['id', 'nama', 'email', 'phoneNumber', 'address', 'interest']
       });
 
       if (!user) {
+        console.log('User not found for ID:', userId);
         throw Boom.notFound('User not found');
       }
 
+      console.log('Profile retrieved successfully');
       return h.response(user).code(200);
     } catch (error) {
-      throw Boom.boomify(error);
+      console.error('Error in getProfile:', error);
+      throw error;
     }
   },
 
@@ -26,30 +31,39 @@ const profileHandler = {
   updateProfile: async (request, h) => {
     try {
       const userId = request.auth.credentials.id;
-      const { name, phoneNumber, address, interest } = request.payload;
+      const { nama, phoneNumber, address, interest } = request.payload;
+      
+      console.log('Updating profile for user ID:', userId);
+      console.log('Update data:', request.payload);
 
       const user = await User.findByPk(userId);
       if (!user) {
+        console.log('User not found for ID:', userId);
         throw Boom.notFound('User not found');
       }
 
+      // Update user data
       await user.update({
-        name,
-        phoneNumber,
-        address,
-        interest
+        nama: nama || user.nama,
+        phoneNumber: phoneNumber || user.phoneNumber,
+        address: address || user.address,
+        interest: interest || user.interest
       });
 
+      console.log('Profile updated successfully');
+      
+      // Return updated user data
       return h.response({
         id: user.id,
-        name: user.name,
+        nama: user.nama,
         email: user.email,
         phoneNumber: user.phoneNumber,
         address: user.address,
         interest: user.interest
       }).code(200);
     } catch (error) {
-      throw Boom.boomify(error);
+      console.error('Error in updateProfile:', error);
+      throw Boom.badImplementation('Failed to update profile');
     }
   },
 

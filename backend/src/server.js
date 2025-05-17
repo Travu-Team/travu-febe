@@ -5,6 +5,7 @@ const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const db = require('./config/database');
 const profileRoutes = require('./routes/profileRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const init = async () => {
     const server = Hapi.server({
@@ -40,7 +41,7 @@ const init = async () => {
     server.auth.default('jwt');
 
     // Register routes
-    server.route(profileRoutes);
+    server.route([...authRoutes, ...profileRoutes]);
 
     // Test database connection
     try {

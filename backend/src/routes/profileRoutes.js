@@ -24,10 +24,10 @@ const profileRoutes = [
       tags: ['api', 'profile'],
       validate: {
         payload: Joi.object({
-          name: Joi.string().required(),
-          phoneNumber: Joi.string().allow(''),
-          address: Joi.string().allow(''),
-          interest: Joi.string().allow('')
+          nama: Joi.string().optional(),
+          phoneNumber: Joi.string().allow('', null).optional(),
+          address: Joi.string().allow('', null).optional(),
+          interest: Joi.string().allow('', null).optional()
         })
       }
     }

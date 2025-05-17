@@ -2,7 +2,6 @@
 
 const { Sequelize } = require('sequelize');
 const db = require('../config/database');
-
 const User = require('./User')(db, Sequelize);
 
 const models = {
@@ -18,5 +17,4 @@ Object.keys(models).forEach(modelName => {
 
 models.sequelize = db;
 models.Sequelize = Sequelize;
-
 module.exports = models;
