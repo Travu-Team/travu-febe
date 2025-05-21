@@ -4,6 +4,7 @@ import RegisterPage from "./register/RegisterPage";
 import LoginPage from "./login/LoginPage";
 import Home from "./pages/Home";
 import Destinasi from "./pages/destinasi/DetailPage";
+import DestinationPlan from "./pages/DestinationPlan";
 import About from "./pages/About";
 import ProfileUser from "./pages/ProfileUser";
 import TravelPlan from "./pages/plan/TravelPlan"
@@ -17,6 +18,7 @@ const App = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/destinasi/:placeName" element={<Destinasi />} />
+        <Route path="/destination" element={<DestinationPlan />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<ProfileUser />} />
         <Route path="/plan" element={<TravelPlan />} />
