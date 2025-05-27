@@ -195,16 +195,14 @@ const ProfileUser = () => {
             {error}
           </div>
         )}        
-        <div className="flex flex-row gap-6">
-          <aside className="w-3/4">
+        <div className="flex flex-row gap-6 border xs:flex-col px-6 w-full">
+          <aside className="w-3/4 xs:w-full">
             <div className="bg-secondary/30 p-6 rounded-lg shadow-md h-fit">
               <h2 className="text-xl font-semibold mb-6 text-gray-800">Navigasi Profil</h2>
-              <ul className="space-y-4">
-                <li>
-                  <a href="#" className="flex items-center gap-3 rounded-lg font-medium">
+              <ul className="space-y-4 cursor-pointer">
+                <li className="flex items-center gap-3">
                     <UserCircleIcon className="h-5 w-5" />
                     Profil Saya
-                  </a>
                 </li>
               </ul>
             </div>          
