@@ -7,22 +7,50 @@ import ButtonCustom from '../components/Button';
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-const InputField = ({ id, label, value, onChange, type = 'text', disabled = false }) => (
-  <div className="mb-4">
-    <label htmlFor={id} className="block text-gray-700 font-semibold mb-2">
-      {label}
-    </label>
-    <input
-      type={type}
-      id={id}
-      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-gray-100 disabled:cursor-not-allowed"
-      value={value}
-      onChange={onChange}
-      disabled={disabled}
-      aria-describedby={`${id}-helper`}
-    />
-  </div>
-);
+const InputField = ({ id, label, value, onChange, type = 'text', disabled = false, options = [] }) => {
+  // Jika type adalah select, render dropdown
+  if (type === 'select') {
+    return (
+      <div className="mb-4">
+        <label htmlFor={id} className="block text-gray-700 font-semibold mb-2">
+          {label}
+        </label>
+        <select
+          id={id}
+          name={id}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-gray-100 disabled:cursor-not-allowed"
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          aria-describedby={`${id}-helper`}
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+  return (
+    <div className="mb-4">
+      <label htmlFor={id} className="block text-gray-700 font-semibold mb-2">
+        {label}
+      </label>
+      <input
+        type={type}
+        id={id}
+        name={id}
+        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-gray-100 disabled:cursor-not-allowed"
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        aria-describedby={`${id}-helper`}
+      />
+    </div>
+  );
+};
 
 const ProfileUser = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -66,12 +94,15 @@ const ProfileUser = () => {
     };
 
   const handleInputChange = (e) => {
-    const { id, value } = e.target;
+    const { id, value, name } = e.target;
+    const fieldName = id || name; // fallback ke name jika id tidak ada
     setUserData(prev => ({
       ...prev,
-      [id]: value
+      [fieldName]: value
     }));
-  };  const handleSubmit = async (event) => {
+  };  
+  
+  const handleSubmit = async (event) => {
     event.preventDefault();
     
     // Jika form tidak dalam mode edit, jangan lakukan apa-apa
@@ -150,8 +181,7 @@ const ProfileUser = () => {
       <ToastContainer />        
       <header className="sticky top-0 z-50">
         <Navbar />
-      </header>
-      
+      </header>      
       <main className="w-full flex-grow">
         <section className="mb-8 text-center">
           <h1 className="text-3xl font-md text-black">Selamat Datang</h1>
@@ -208,6 +238,48 @@ const ProfileUser = () => {
               <InputField
                 id="address"
                 label="Domisili"
+                type="select"
+                options={[
+                  { value: "", label: "Pilih Domisili" },
+                  { value: "Aceh", label: "Aceh" },
+                  { value: "Sumatera Utara", label: "Sumatera Utara" },
+                  { value: "Sumatera Barat", label: "Sumatera Barat" },
+                  { value: "Riau", label: "Riau" },
+                  { value: "Kepulauan Riau", label: "Kepulauan Riau" },
+                  { value: "Jambi", label: "Jambi" },
+                  { value: "Bengkulu", label: "Bengkulu" },
+                  { value: "Sumatera Selatan", label: "Sumatera Selatan" },
+                  { value: "Bangka Belitung", label: "Bangka Belitung" },
+                  { value: "Lampung", label: "Lampung" },
+                  { value: "Jakarta", label: "Jakarta" },
+                  { value: "Jawa Barat", label: "Jawa Barat" },
+                  { value: "Banten", label: "Banten" },
+                  { value: "Jawa Tengah", label: "Jawa Tengah" },
+                  { value: "Yogyakarta", label: "Yogyakarta" },
+                  { value: "Jawa Timur", label: "Jawa Timur" },
+                  { value: "Bali", label: "Bali" },
+                  { value: "Nusa Tenggara Barat", label: "Nusa Tenggara Barat" },
+                  { value: "Nusa Tenggara Timur", label: "Nusa Tenggara Timur" },
+                  { value: "Kalimantan Barat", label: "Kalimantan Barat" },
+                  { value: "Kalimantan Tengah", label: "Kalimantan Tengah" },
+                  { value: "Kalimantan Selatan", label: "Kalimantan Selatan" },
+                  { value: "Kalimantan Timur", label: "Kalimantan Timur" },
+                  { value: "Kalimantan Utara", label: "Kalimantan Utara" },
+                  { value: "Sulawesi Utara", label: "Sulawesi Utara" },
+                  {value: "Gorontalo", label: "Gorontalo" },
+                  { value: "Sulawesi Tengah", label: "Sulawesi Tengah" },
+                  { value: "Sulawesi Barat", label: "Sulawesi Barat" },
+                  { value: "Sulawesi Selatan", label: "Sulawesi Selatan" },
+                  { value: "Sulawesi Tenggara", label: "Sulawesi Tenggara" },
+                  { value: "Maluku", label: "Maluku" },
+                  { value: "Maluku Utara", label: "Maluku Utara" },
+                  { value: "Papua", label: "Papua" },
+                  { value: "Papua Barat", label: "Papua Barat" },
+                  { value: "Papua Pegunungan", label: "Papua Pegunungan" },
+                  { value: "Papua Tengah", label: "Papua Tengah" },
+                  { value: "Papua Selatan", label: "Papua Selatan" },
+                  { value: "Papua Barat Daya", label: "Papua Barat Daya" }
+                ]}
                 value={userData.address}
                 onChange={handleInputChange}
                 disabled={!isEditing}
@@ -215,10 +287,37 @@ const ProfileUser = () => {
               <InputField
                 id="interest"
                 label="Minat"
+                type="select"
+                options={[
+                  { value: "", label: "Pilih Minat" },
+                  { value: "Air Terjun", label: "Air Terjun" },
+                  { value: "Alun-Alun", label: "Bandung" },
+                  { value: "Bukit", label: "Surabaya" },
+                  { value: "Cafe View", label: "Medan" },
+                  { value: "Candi", label: "Candi" },
+                  { value: "Gunung", label: "Gunung" },
+                  { value: "Kebun Binatang", label: "Kebun Binatang" },
+                  { value: "Lembah", label: "Lembah" },
+                  { value: "Mall", label: "Mall" },
+                  { value: "Monumen", label: "Monumen" },
+                  { value: "Museum", label: "Museum" },
+                  { value: "Pantai", label: "Pantai" },
+                  { value: "Rumah Adat", label: "Rumah Adat" },
+                  { value: "Taman", label: "Taman" },
+                  { value: "Wahana Keluarga", label: "Wahana Keluarga" },
+                  { value: "Wisata Religi", label: "Wisata Religi" },
+                  { value: "Wisata Alam", label: "Wisata Alam" },
+                  { value: "Wisata Edukasi", label: "Wisata Edukasi" },
+                  { value: "Wisata Kerajaan", label: "Wisata Kerajaan" },
+                  { value: "Wisata Kuliner", label: "Wisata Kuliner" },
+                  { value: "Wisata Lampion", label: "Wisata Lampion" },
+                  { value: "Wisata Tematik", label: "Wisata Tematik" },
+                ]}
                 value={userData.interest}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-              />                <div className="flex gap-4 mt-6 justify-start w-full">
+              />               
+              <div className="flex gap-4 mt-6 justify-start w-full">
                 {!isEditing ? (
                   <ButtonCustom 
                     type="button" 
