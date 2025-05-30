@@ -21,6 +21,19 @@ const authRoutes = [
         }
     },
     {
+    method: 'POST',
+    path: '/api/auth/forgot-password',
+    handler: authHandler.forgotPassword,
+    options: {
+        auth: false,
+        validate: {
+            payload: Joi.object({
+                email: Joi.string().email().required()
+            })
+        }
+    }
+},
+    {
         method: 'POST',
         path: '/api/auth/login',
         handler: authHandler.login,

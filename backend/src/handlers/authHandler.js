@@ -48,7 +48,58 @@ const authHandler = {
             throw Boom.boomify(error);
         }
     },
+    forgotPassword: async (request, h) => {
+  const { email } = request.payload;
+  const user = await User.findOne({ where: { email } });
+  if (!user) {
+    throw Boom.notFound('Email tidak terdaftar');
+  }
 
+  const token = JWT.token.generate(
+    {
+      email: user.email,
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 // expired in 1 hour
+    },
+    process.env.JWT_SECRET
+  );
+
+  // Kirim email ke user dengan tautan reset password
+  // Misal: `http://localhost:5173/reset-password/${token}`
+  console.log(`Link reset: http://localhost:5173/reset-password/${token}`);
+
+  return h.response({ status: 'success', message: 'Link reset password telah dikirim ke email (simulasi)' });
+}
+,
+resetPassword: async (request, h) => {
+  try {
+    const { token } = request.params;
+    const { newPassword } = request.payload;
+
+    // Verifikasi token
+    const decoded = JWT.token.decode(token);
+    const isValid = JWT.token.verify(decoded, process.env.JWT_SECRET);
+
+    if (!isValid) {
+      throw Boom.unauthorized('Token tidak valid atau kedaluwarsa');
+    }
+
+    const { email } = decoded.decoded.payload;
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      throw Boom.notFound('Pengguna tidak ditemukan');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await user.update({ password: hashedPassword });
+
+    return h.response({ status: 'success', message: 'Password berhasil diubah' }).code(200);
+  } catch (error) {
+    console.error('Reset password error:', error);
+    return Boom.boomify(error);
+  }
+}
+,
     login: async (request, h) => {
         try {
             const { email, password } = request.payload;
