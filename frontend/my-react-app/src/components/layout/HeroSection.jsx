@@ -5,7 +5,7 @@ const HeroSection = () => {
     <div
       className="w-full min-h-screen flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat text-left text-base sm:text-[20px] lg:text-[24px] text-[#3a59d1] font-poppins relative overflow-hidden"
       style={{
-        backgroundImage: "url('../image/bg2.jpg')",
+        backgroundImage: "url('../image/bg.svg')",
       }}
     >
       {/* Background Overlay */}
@@ -70,7 +70,7 @@ const HeroSection = () => {
           {/* Right Panel Image - Visible on lg screens and up */}
           <div className="hidden lg:flex lg:items-center lg:justify-end w-full max-w-[585px] animate-slide-in-right">
             <img
-              src="/image/right-panel.png"
+              src="/image/right-panel.svg"
               alt="Travel Destination"
               className="w-full h-auto max-h-[485px] object-contain hover:scale-105 hover:rotate-1 transition-all duration-500 hover:shadow-2xl"
             />

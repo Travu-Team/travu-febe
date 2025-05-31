@@ -16,7 +16,7 @@ const LoginSection = () => {
           {/* Left Image - Full height on desktop */}
           <div className="w-full lg:w-1/2 flex justify-center lg:justify-end p-8 lg:p-12 bg-blue-700/20">
             <img
-              src="/image/karakter.png"
+              src="/image/karakter.svg"
               alt="Karakter Travu"
               className="w-full max-w-[280px] lg:max-w-none lg:h-[400px] object-contain object-center animate-float"
             />
