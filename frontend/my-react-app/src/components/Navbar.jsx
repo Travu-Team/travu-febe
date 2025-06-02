@@ -1,12 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { authService } from "../services/authService";
+import { jwtDecode } from "jwt-decode";
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const token = authService.getToken();
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        console.log("Decoded token:", decoded);
+        setUser({
+          username: decoded.nama,
+          email: decoded.email,
+        });
+      } catch {
+        setUser(null);
+      }
+    } else {
+      setUser(null);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    authService.removeToken();
+    setUser(null);
+    window.location.href = "/login"; // redirect ke halaman login
+  };
+
+  const getInitials = (name) => {
+    if (!name) return "";
+    const names = name.trim().split(" ");
+    if (names.length === 1) return names[0][0].toUpperCase();
+    return (names[0][0] + names[1][0]).toUpperCase();
+  };
 
   return (
     <nav className="w-full bg-white h-[60px] shadow-md z-50 relative">
@@ -28,7 +62,7 @@ const Navbar = () => {
           <a href="/about" className="text-[#3a59d1] hover:underline">
             Tentang Kami
           </a>
-          <a href="/plan/travelplan" className="text-[#3a59d1] hover:underline">
+          <a href="/plan" className="text-[#3a59d1] hover:underline">
             Rencana Wisata
           </a>
         </div>
@@ -45,60 +79,41 @@ const Navbar = () => {
           </button>
 
           {/* Profile Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-              className={`flex items-center text-white rounded-full 
-    focus:outline-none focus:ring-2 focus:ring-blue-300 hover:ring-2 hover:ring-blue-400 transition`}
-              aria-haspopup="true"
-              aria-expanded={isProfileDropdownOpen}
-              aria-label="User profile menu"
-            >
-              <img
-                src="/image/user-profile.png"
-                alt="Kaluna Profile"
-                className="w-10 h-10 object-cover rounded-full"
-              />
-              <span className="hidden sm:inline-block ml-2">Kaluna</span>
-            </button>
+          {user && (
+            <div className="relative">
+              <button
+                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                className={`flex items-center text-white rounded-full bg-[#3a59d1] w-10 h-10 justify-center font-semibold focus:outline-none focus:ring-2 focus:ring-blue-300 hover:ring-2 hover:ring-blue-400 transition`}
+                aria-haspopup="true"
+                aria-expanded={isProfileDropdownOpen}
+                aria-label="User profile menu"
+              >
+                {getInitials(user.username)}
+              </button>
+              <span className="hidden sm:inline-block ml-2 text-[#3a59d1] font-semibold">
+                {user.username}
+              </span>
 
-            {isProfileDropdownOpen && (
-              <ul className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-50">
-                <li>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-                  >
-                    Dashboard
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-                  >
-                    Settings
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-                  >
-                    Earnings
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-                  >
-                    Sign Out
-                  </a>
-                </li>
-              </ul>
-            )}
-          </div>
+              {isProfileDropdownOpen && (
+                <ul className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-50">
+                  <li className="px-4 py-2 text-gray-800 break-words">
+                    {user.username}
+                  </li>
+                  <li className="px-4 py-2 text-gray-800 break-words">
+                    {user.email}
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                    >
+                      Sign Out
+                    </button>
+                  </li>
+                </ul>
+              )}
+            </div>
+          )}
 
           {/* Hamburger Menu */}
           <button
@@ -123,7 +138,6 @@ const Navbar = () => {
             className="w-full p-2 pl-10 bg-gray-200 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Search"
           />
-
           <FontAwesomeIcon
             icon={faSearch}
             className="absolute top-3 left-7 text-gray-400"
@@ -153,10 +167,10 @@ const Navbar = () => {
             </li>
             <li>
               <a
-                href="/services"
+                href="/plan"
                 className="block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded"
               >
-                Services
+                Rencana Wisata
               </a>
             </li>
           </ul>

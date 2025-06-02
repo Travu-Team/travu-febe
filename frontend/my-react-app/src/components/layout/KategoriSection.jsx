@@ -45,14 +45,14 @@ const KategoriSection = () => {
   };
 
   return (
-    <div className="w-full px-4 lg:px-8 py-8 font-poppins">
+    <div className="w-full px-4 lg:px-8 md:px- py-8 font-poppins">
       <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 px-2 lg:px-8">
         {/* Judul + Deskripsi */}
         <div className="flex-1">
-          <h2 className="text-2xl md:text-3xl font-semibold text-blue-600 mb-1">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-blue-600 mb-1">
             Kategori Minat Wisata
-          </h2>
-          <p className="text-gray-700 text-base md:text-lg">
+          </h1>
+          <p className="text-[#0F0F0F] text-lg md:text-xl lg:text-xl font-medium font-poppins">
             Kamu mau wisata kemana, nih?
           </p>
         </div>
@@ -66,11 +66,12 @@ const KategoriSection = () => {
                 setKategoriAktif(kategori);
                 setCurrentIndex(0);
               }}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
-                kategoriAktif === kategori
-                  ? "bg-green-500 text-white shadow-md"
-                  : "bg-gray-100 border border-gray-300 text-gray-600 hover:bg-gray-200"
-              }`}
+              className={`text-base md:text-lg font-semibold px-6 md:px-8 py-3 md:py-4 rounded-xl border transition-all duration-200
+    ${
+      kategoriAktif === kategori
+        ? "bg-[#47BB8E] text-white border-transparent"
+        : "bg-gray-100 border border-gray-300 text-gray-600 hover:bg-gray-200"
+    }`}
             >
               {kategori}
             </button>
@@ -80,7 +81,7 @@ const KategoriSection = () => {
 
       {/* Gambar */}
       {isMobile ? (
-        <div className=" pt-6">
+        <div className=" pt-6 ">
           <div className="relative w-full max-w-sm mx-auto">
             <img
               src={gambarAktif[currentIndex]}
@@ -102,7 +103,7 @@ const KategoriSection = () => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-row gap-4 items-start pt-8">
+        <div className="flex flex-row gap-4 items-start pt-8 px-3 lg:px-5">
           {/* Gambar Utama */}
           <div className="flex-shrink-0">
             <img
