@@ -38,7 +38,7 @@ const LoginPage = () => {
 
       if (response.token) {
         // Token akan disimpan oleh authService berdasarkan rememberMe
-        navigate("/profile");
+        navigate("/");
       } else {
         setErrorMessage(data.message || "Login gagal, periksa kembali email dan password.");
       }

@@ -18,6 +18,7 @@
     "@heroicons/react": "^2.2.0",
     "@material-tailwind/react": "^2.1.10",
     "framer-motion": "^12.14.0",
+    "jwt-decode": "^4.0.0",
     "papaparse": "^5.5.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
