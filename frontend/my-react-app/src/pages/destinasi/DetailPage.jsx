@@ -9,7 +9,7 @@ const DestinasiDetail = () => {
   const [detail, setDetail] = useState(null);
 
   useEffect(() => {
-    fetch("/src/data/wisata_indonesia_final.csv")
+    fetch("/src/data/wisata_indonesia_final_fix.csv")
       .then((res) => res.text())
       .then((data) => {
         const result = Papa.parse(data, { header: true, skipEmptyLines: true });
@@ -18,7 +18,9 @@ const DestinasiDetail = () => {
           decodeURIComponent(placeName).trim().toLowerCase() === item.nama_wisata.trim().toLowerCase()
         );
 
-        setDetail(found);
+        if (found) {
+          setDetail(found);
+        }
       });
   }, [placeName]);
 
@@ -31,7 +33,7 @@ const DestinasiDetail = () => {
     </div>
   );
 
-  const imageSrc = detail.path_gambar.startsWith("http") ? detail.path_gambar : `/images/${detail.path_gambar}`;
+  const imageSrc = detail.Image_Path.startsWith("http") ? detail.Image_Path : `/public/images/${detail.Image_Path}`;
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${detail.latitude},${detail.longitude}`;
 
   return (
@@ -44,13 +46,12 @@ const DestinasiDetail = () => {
           <div>
             <h1 className="text-3xl font-bold text-blue-800 mb-2">{detail.nama_wisata}</h1>
             <p className="text-sm text-gray-500 italic mb-4">{detail.kota_kabupaten}, {detail.provinsi}</p>
-            <p className="text-gray-700 text-base">{detail.deskripsi}</p>
+            <p className="text-gray-700 text-base">{detail.deskripsi_bersih}</p>
 
-           <div className="mt-4 text-left">
-  <h2 className="text-xl font-semibold text-gray-800">📍 Alamat</h2>
-  <p className="text-gray-600 pl-2">{detail.alamat}</p>
-</div>
-
+            <div className="mt-4 text-left">
+              <h2 className="text-xl font-semibold text-gray-800">📍 Alamat</h2>
+              <p className="text-gray-600 pl-2">{detail.alamat}</p>
+            </div>
 
             <div className="mt-4">
               <h2 className="text-xl font-semibold text-gray-800">Kategori Wisata</h2>
