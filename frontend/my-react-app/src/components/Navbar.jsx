@@ -54,13 +54,28 @@ const Navbar = () => {
 
         {/* Right side (Desktop Navigation + Profile + Search) */}
         <div className="hidden md:flex items-center space-x-6">
-          <a href="/" className="text-[#3a59d1] hover:underline">
+          <a
+            href="/"
+            className={`text-[#6a7bd9] ${
+              location.pathname === "/" ? "font-bold" : ""
+            } hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
+          >
             Home
           </a>
-          <a href="/about" className="text-[#3a59d1] hover:underline">
+          <a
+            href="/about"
+            className={`text-[#6a7bd9] ${
+              location.pathname === "/about" ? "font-bold" : ""
+            } hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
+          >
             Tentang Kami
           </a>
-          <a href="/plan" className="text-[#3a59d1] hover:underline">
+          <a
+            href="/plan"
+            className={`text-[#6a7bd9] ${
+              location.pathname === "/plan" ? "font-bold" : ""
+            } hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
+          >
             Rencana Wisata
           </a>
 
@@ -201,11 +216,11 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-[60px] left-0 w-full bg-white shadow-lg z-40">
-          <ul className="flex flex-col px-4 py-2 space-y-2">
+          <ul className="flex flex-col px-4 py-2 space-y-2 ">
             <li>
               <a
                 href="/"
-                className="block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded"
+                className="block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded "
               >
                 Home
               </a>
