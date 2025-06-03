@@ -95,7 +95,7 @@ const Navbar = () => {
                   <li>
                     <a
                       href="/profile"
-                      className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-gray-200"
+                      className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-gray-200 hover:text-gray-800 font-normal no-underline focus:outline-none"
                     >
                       Settings
                     </a>
@@ -103,7 +103,7 @@ const Navbar = () => {
                   <li>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left block px-4 py-3 text-gray-00 hover:bg-gray-200"
+                      className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-gray-200 hover:text-gray-800 font-normal focus:outline-none"
                     >
                       Sign Out
                     </button>
