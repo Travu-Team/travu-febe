@@ -45,6 +45,4 @@ function Home() {
 
 export default Home;
 
-{
-  /* <StarIcon className="h-5 w-5 text-yellow-800" />; */
-}
+

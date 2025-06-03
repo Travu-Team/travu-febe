@@ -99,13 +99,14 @@ const Navbar = () => {
                   <li className="px-4 py-2 text-gray-800 break-words">
                     {user.username}
                   </li>
-                  <li className="px-4 py-2 text-gray-800 break-words">
+                  <li className="px-4 my-0 text-gray-800 break-words">
                     {user.email}
                   </li>
+                  <hr className="my-2 border-gray-300" /> {/* Pembatas */}
                   <li>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                      className="w-full text-left block px-4 py-3 text-gray-900 hover:bg-gray-200"
                     >
                       Sign Out
                     </button>
