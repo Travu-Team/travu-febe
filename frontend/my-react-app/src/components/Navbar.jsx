@@ -8,7 +8,6 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -16,7 +15,6 @@ const Navbar = () => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        console.log("Decoded token:", decoded);
         setUser({
           username: decoded.nama,
           email: decoded.email,
@@ -32,7 +30,7 @@ const Navbar = () => {
   const handleLogout = () => {
     authService.removeToken();
     setUser(null);
-    window.location.href = "/login"; // redirect ke halaman login
+    window.location.href = "/login";
   };
 
   const getInitials = (name) => {
@@ -54,7 +52,7 @@ const Navbar = () => {
           />
         </a>
 
-        {/* Desktop Menu */}
+        {/* Right side (Desktop Navigation + Profile + Search) */}
         <div className="hidden md:flex items-center space-x-6">
           <a href="/" className="text-[#3a59d1] hover:underline">
             Home
@@ -65,11 +63,57 @@ const Navbar = () => {
           <a href="/plan" className="text-[#3a59d1] hover:underline">
             Rencana Wisata
           </a>
-        </div>
 
-        {/* Kanan */}
-        <div className="flex items-center space-x-2">
-          {/* Search Toggle */}
+          {/* Profile Dropdown */}
+          {user && (
+            <div className="relative">
+              <button
+                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                className="flex items-center bg-[#3a59d1] text-white font-semibold rounded-full px-4 py-1 shadow-md hover:ring-2 hover:ring-blue-400 transition"
+                aria-haspopup="true"
+                aria-expanded={isProfileDropdownOpen}
+              >
+                <img
+                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    getInitials(user.username)
+                  )}&background=ffffff&bold=true`}
+                  alt="Avatar"
+                  className="w-8 h-8 rounded-full mr-2"
+                />
+                Hai, {user.username.split(" ")[0]}!
+              </button>
+
+              {isProfileDropdownOpen && (
+                <ul className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-50">
+                  {/* <li className="px-4 py-2 text-gray-800 break-words">
+                      {user.username}
+                    </li>
+                    <li className="px-4 my-0 text-gray-800 break-words">
+                      {user.email}
+                    </li>
+                    <hr className="my-2 border-gray-300" /> */}
+                  <li>
+                    <a
+                      href="/profile"
+                      className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-gray-200"
+                    >
+                      Settings
+                    </a>
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left block px-4 py-3 text-gray-00 hover:bg-gray-200"
+                    >
+                      Sign Out
+                    </button>
+                  </li>
+                </ul>
+              )}
+            </div>
+          )}
+
+          {/* Search Toggle (Desktop) */}
           <button
             onClick={() => setIsSearchOpen(!isSearchOpen)}
             aria-label="Toggle search"
@@ -77,22 +121,21 @@ const Navbar = () => {
           >
             <FontAwesomeIcon icon={faSearch} />
           </button>
+        </div>
 
-          {/* Profile Dropdown */}
+        {/* Mobile Right Side */}
+        <div className="md:hidden flex items-center space-x-2">
+          {/* Mobile: Avatar Initials */}
           {user && (
             <div className="relative">
               <button
                 onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                className={`flex items-center text-white rounded-full bg-[#3a59d1] w-10 h-10 justify-center font-semibold focus:outline-none focus:ring-2 focus:ring-blue-300 hover:ring-2 hover:ring-blue-400 transition`}
+                className="w-10 h-10 bg-[#3a59d1] text-white rounded-full flex items-center justify-center font-semibold focus:outline-none focus:ring-2 focus:ring-blue-300 hover:ring-2 hover:ring-blue-400 transition"
                 aria-haspopup="true"
                 aria-expanded={isProfileDropdownOpen}
-                aria-label="User profile menu"
               >
                 {getInitials(user.username)}
               </button>
-              <span className="hidden sm:inline-block ml-2 text-[#3a59d1] font-semibold">
-                {user.username}
-              </span>
 
               {isProfileDropdownOpen && (
                 <ul className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-50">
@@ -102,7 +145,7 @@ const Navbar = () => {
                   <li className="px-4 my-0 text-gray-800 break-words">
                     {user.email}
                   </li>
-                  <hr className="my-2 border-gray-300" /> {/* Pembatas */}
+                  <hr className="my-2 border-gray-300" />
                   <li>
                     <button
                       onClick={handleLogout}
@@ -116,10 +159,19 @@ const Navbar = () => {
             </div>
           )}
 
+          {/* Search Toggle */}
+          <button
+            onClick={() => setIsSearchOpen(!isSearchOpen)}
+            aria-label="Toggle search"
+            className="w-10 h-10 bg-[#3a59d1] text-white rounded-full flex items-center justify-center"
+          >
+            <FontAwesomeIcon icon={faSearch} />
+          </button>
+
           {/* Hamburger Menu */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden w-10 h-10 text-[#3a59d1]"
+            className="w-10 h-10 text-[#3a59d1]"
             aria-label="Toggle navigation menu"
           >
             <FontAwesomeIcon
