@@ -4,7 +4,7 @@ import { faFacebook, faInstagram, faTwitter } from '@fortawesome/free-brands-svg
 
 const Footer = () => {
   return (
-    <footer className="bg-white text-gray-700 py-8 w-full">
+    <footer className="bg-white text-gray-700 w-full">
       <div className="w-full max-w-screen-xl mx-auto px-4 flex flex-col items-center space-y-4">
         <img src="/image/logo-travu.png" alt="Travu Logo" className="w-24 h-24" />
 
