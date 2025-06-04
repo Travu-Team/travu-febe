@@ -46,7 +46,7 @@ const Navbar = () => {
         {/* Logo */}
         <a href="/" className="flex items-center" aria-label="TRAVU Homepage">
           <img
-            src="../../src/assets/img/TRAVU_LOGOs.jpg"
+            src="../../src/assets/img/travu-logo2.png"
             alt="Logo TRAVU"
             className="w-[100px] h-[40px] object-contain"
           />
@@ -60,7 +60,7 @@ const Navbar = () => {
               location.pathname === "/" ? "font-bold" : ""
             } hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
           >
-            Home
+            Beranda
           </a>
           <a
             href="/about"
@@ -84,17 +84,19 @@ const Navbar = () => {
             <div className="relative">
               <button
                 onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                className="flex items-center bg-[#3a59d1] text-white font-semibold rounded-full px-4 py-1 shadow-md hover:ring-2 hover:ring-blue-400 transition"
+                className="flex items-center bg-[#3a59d1] text-white border font-semibold rounded-full px-4 py-1 shadow-md hover:ring-2 hover:ring-blue-400 transition"
                 aria-haspopup="true"
                 aria-expanded={isProfileDropdownOpen}
               >
-                <img
-                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    getInitials(user.username)
-                  )}&background=ffffff&bold=true`}
-                  alt="Avatar"
-                  className="w-8 h-8 rounded-full mr-2"
-                />
+                <div className="w-9 h-9 rounded-full bg-white p-[2px] mr-2">
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      getInitials(user.username)
+                    )}&background=3a59d1&bold=true&color=fff`}
+                    alt="Avatar"
+                    className="w-full h-full rounded-full"
+                  />
+                </div>
                 Hai, {user.username.split(" ")[0]}!
               </button>
 

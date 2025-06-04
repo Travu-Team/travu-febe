@@ -1,15 +1,23 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
-import 'react-toastify/dist/ReactToastify.css';
-import ButtonCustom from '../components/Button';
+import "react-toastify/dist/ReactToastify.css";
+import ButtonCustom from "../components/Button";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-const InputField = ({ id, label, value, onChange, type = 'text', disabled = false, options = [] }) => {
+const InputField = ({
+  id,
+  label,
+  value,
+  onChange,
+  type = "text",
+  disabled = false,
+  options = [],
+}) => {
   // Jika type adalah select, render dropdown
-  if (type === 'select') {
+  if (type === "select") {
     return (
       <div className="mb-4">
         <label htmlFor={id} className="block text-gray-700 font-semibold mb-2">
@@ -57,11 +65,11 @@ const ProfileUser = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [userData, setUserData] = useState({
-    nama: '',
-    phoneNumber: '',
-    email: '',
-    address: '',
-    interest: ''
+    nama: "",
+    phoneNumber: "",
+    email: "",
+    address: "",
+    interest: "",
   });
   const [originalData, setOriginalData] = useState(null);
 
@@ -74,44 +82,44 @@ const ProfileUser = () => {
   const fetchUserData = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:5000/api/user/profile', {
-        method: 'GET',
+      const response = await fetch("http://localhost:5000/api/user/profile", {
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // Mengambil token JWT dari localStorage
-        }
-      });      
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Mengambil token JWT dari localStorage
+        },
+      });
       if (!response.ok) {
-        throw new Error('Gagal mengambil data profil');
+        throw new Error("Gagal mengambil data profil");
       }
-        const data = await response.json();
-        setUserData(data);
-        setOriginalData(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      const data = await response.json();
+      setUserData(data);
+      setOriginalData(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { id, value, name } = e.target;
     const fieldName = id || name; // fallback ke name jika id tidak ada
-    setUserData(prev => ({
+    setUserData((prev) => ({
       ...prev,
-      [fieldName]: value
+      [fieldName]: value,
     }));
-  };  
-  
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     // Jika form tidak dalam mode edit, jangan lakukan apa-apa
     if (!isEditing) {
       return;
     }
 
     // Memeriksa apakah ada perubahan data
-    const hasChanges = 
+    const hasChanges =
       userData.nama !== originalData?.nama ||
       userData.phoneNumber !== originalData?.phoneNumber ||
       userData.address !== originalData?.address ||
@@ -125,51 +133,52 @@ const ProfileUser = () => {
 
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
-      
+      const token = localStorage.getItem("token");
+
       if (!token) {
-        setError('Token tidak ditemukan. Silakan login kembali.');
-        navigate('/login');
+        setError("Token tidak ditemukan. Silakan login kembali.");
+        navigate("/login");
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/user/profile', {
-        method: 'PUT',
+      const response = await fetch("http://localhost:5000/api/user/profile", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           nama: userData.nama,
           phoneNumber: userData.phoneNumber,
           address: userData.address,
-          interest: userData.interest
-        })
+          interest: userData.interest,
+        }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Gagal memperbarui profil');
-      }      const updatedData = await response.json();
+        throw new Error(errorData.message || "Gagal memperbarui profil");
+      }
+      const updatedData = await response.json();
       setUserData(updatedData);
       setIsEditing(false);
-      toast.success('Profil berhasil diperbarui!', {
+      toast.success("Profil berhasil diperbarui!", {
         position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
-        draggable: true
+        draggable: true,
       });
     } catch (err) {
       setError(err.message);
-      toast.error('Gagal memperbarui profil: ' + err.message, {
+      toast.error("Gagal memperbarui profil: " + err.message, {
         position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
-        draggable: true
+        draggable: true,
       });
     } finally {
       setIsLoading(false);
@@ -177,16 +186,18 @@ const ProfileUser = () => {
   };
 
   return (
-    <div className="w-full mx-auto min-h-screen flex flex-col">
-      <ToastContainer />        
+    <div className="w-full mx-auto min-h-screen flex flex-col bg-white">
+      <ToastContainer />
       <header className="sticky top-0 z-50">
         <Navbar />
-      </header>      
+      </header>
       <main className="w-full flex-grow">
         <section className="mb-8 text-center">
           <h1 className="text-3xl font-md text-black">Selamat Datang</h1>
           <p className="text-xl font-md text-gray-600 mt-2">
-            {isEditing ? 'Silakan Edit Profil Anda' : 'Di Halaman Informasi Profil'}
+            {isEditing
+              ? "Silakan Edit Profil Anda"
+              : "Di Halaman Informasi Profil"}
           </p>
         </section>
 
@@ -194,21 +205,23 @@ const ProfileUser = () => {
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
             {error}
           </div>
-        )}        
+        )}
         <div className="flex flex-row gap-6 border xs:flex-col px-6 w-full">
           <aside className="w-3/4 xs:w-full">
             <div className="bg-secondary/30 p-6 rounded-lg shadow-md h-fit">
-              <h2 className="text-xl font-semibold mb-6 text-gray-800">Navigasi Profil</h2>
+              <h2 className="text-xl font-semibold mb-6 text-gray-800">
+                Navigasi Profil
+              </h2>
               <ul className="space-y-4 cursor-pointer">
                 <li className="flex items-center gap-3">
-                    <UserCircleIcon className="h-5 w-5" />
-                    Profil Saya
+                  <UserCircleIcon className="h-5 w-5" />
+                  Profil Saya
                 </li>
               </ul>
-            </div>          
-            </aside>            
-            
-            <section className="border border-gray-400 w-full p-6 bg-white rounded-lg shadow-md">
+            </div>
+          </aside>
+
+          <section className="border border-gray-400 w-full p-6 bg-white rounded-lg shadow-md">
             <form onSubmit={handleSubmit} className="w-full mr-60">
               <InputField
                 id="nama"
@@ -256,15 +269,21 @@ const ProfileUser = () => {
                   { value: "Yogyakarta", label: "Yogyakarta" },
                   { value: "Jawa Timur", label: "Jawa Timur" },
                   { value: "Bali", label: "Bali" },
-                  { value: "Nusa Tenggara Barat", label: "Nusa Tenggara Barat" },
-                  { value: "Nusa Tenggara Timur", label: "Nusa Tenggara Timur" },
+                  {
+                    value: "Nusa Tenggara Barat",
+                    label: "Nusa Tenggara Barat",
+                  },
+                  {
+                    value: "Nusa Tenggara Timur",
+                    label: "Nusa Tenggara Timur",
+                  },
                   { value: "Kalimantan Barat", label: "Kalimantan Barat" },
                   { value: "Kalimantan Tengah", label: "Kalimantan Tengah" },
                   { value: "Kalimantan Selatan", label: "Kalimantan Selatan" },
                   { value: "Kalimantan Timur", label: "Kalimantan Timur" },
                   { value: "Kalimantan Utara", label: "Kalimantan Utara" },
                   { value: "Sulawesi Utara", label: "Sulawesi Utara" },
-                  {value: "Gorontalo", label: "Gorontalo" },
+                  { value: "Gorontalo", label: "Gorontalo" },
                   { value: "Sulawesi Tengah", label: "Sulawesi Tengah" },
                   { value: "Sulawesi Barat", label: "Sulawesi Barat" },
                   { value: "Sulawesi Selatan", label: "Sulawesi Selatan" },
@@ -276,7 +295,7 @@ const ProfileUser = () => {
                   { value: "Papua Pegunungan", label: "Papua Pegunungan" },
                   { value: "Papua Tengah", label: "Papua Tengah" },
                   { value: "Papua Selatan", label: "Papua Selatan" },
-                  { value: "Papua Barat Daya", label: "Papua Barat Daya" }
+                  { value: "Papua Barat Daya", label: "Papua Barat Daya" },
                 ]}
                 value={userData.address}
                 onChange={handleInputChange}
@@ -314,11 +333,11 @@ const ProfileUser = () => {
                 value={userData.interest}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-              />               
+              />
               <div className="flex gap-4 mt-6 justify-start w-full">
                 {!isEditing ? (
-                  <ButtonCustom 
-                    type="button" 
+                  <ButtonCustom
+                    type="button"
                     onClick={(e) => {
                       e.preventDefault();
                       setIsEditing(true);
@@ -328,8 +347,8 @@ const ProfileUser = () => {
                   </ButtonCustom>
                 ) : (
                   <>
-                    <ButtonCustom 
-                      type="submit" 
+                    <ButtonCustom
+                      type="submit"
                       disabled={isLoading}
                       onClick={(e) => {
                         if (!isEditing) {
@@ -338,8 +357,8 @@ const ProfileUser = () => {
                         }
                       }}
                     >
-                      {isLoading ? 'Menyimpan...' : 'Simpan'}
-                    </ButtonCustom>                    
+                      {isLoading ? "Menyimpan..." : "Simpan"}
+                    </ButtonCustom>
                     <ButtonCustom
                       type="cancel"
                       onClick={(e) => {

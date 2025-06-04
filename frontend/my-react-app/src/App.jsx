@@ -7,13 +7,15 @@ import Destinasi from "./pages/destinasi/DetailPage";
 import DestinationPlan from "./pages/DestinationPlan";
 import About from "./pages/About";
 import ProfileUser from "./pages/ProfileUser";
-import TravelPlan from "./pages/plan/TravelPlan"
+import TravelPlan from "./pages/plan/TravelPlan";
 import ForgotPassword from "./utils/LupaSandi";
 import ResetPassword from "./utils/resetPasword";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
     <Router>
+      <Toaster position="top-center" reverseOrder={false} />
       <Routes>
         <Route path="/" element={<Home />} /> {/* Default halaman */}
         <Route path="/register" element={<RegisterPage />} />
@@ -25,7 +27,14 @@ const App = () => {
         <Route path="/plan" element={<TravelPlan />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="*" element={<h1 className="text-center text-red-600 text-3xl mt-10">404: Not Found</h1>} />
+        <Route
+          path="*"
+          element={
+            <h1 className="text-center text-red-600 text-3xl mt-10">
+              404: Not Found
+            </h1>
+          }
+        />
       </Routes>
     </Router>
   );

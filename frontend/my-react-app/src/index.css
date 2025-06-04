@@ -60,6 +60,7 @@ h1 {
 .about-image {
   background-image: linear-gradient(270deg, rgba(0, 0, 0, 0) 39%, rgba(0, 0, 0, 0.60) 70%),
     url(./assets/img/img-about.png);
+
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -104,3 +105,19 @@ h1 {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}

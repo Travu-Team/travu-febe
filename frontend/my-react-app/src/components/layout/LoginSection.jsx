@@ -5,7 +5,7 @@ const MotionDiv = motion.div;
 
 const LoginSection = () => {
   return (
-    <section className="flex justify-center items-center min-h-[500px] py-12 px-4 sm:px-6">
+    <section className="flex justify-center items-center min-h-[500px] py-10 px-4 sm:px-6">
       <MotionDiv
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -25,8 +25,9 @@ const LoginSection = () => {
           {/* Right Content - Centered both horizontally and vertically */}
           <div className="w-full lg:w-1/2 flex flex-col justify-center p-8 lg:p-12 space-y-6">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
-              Perjalanan yang <span className="text-yellow-300">Baik</span> adalah
-              perjalanan tanpa <span className="font-extrabold block">Penyesalan</span>
+              Perjalanan yang <span className="text-yellow-300">Baik</span>{" "}
+              adalah perjalanan tanpa{" "}
+              <span className="font-extrabold block">Penyesalan</span>
             </h1>
             <p className="text-white/90 text-base sm:text-lg lg:text-xl leading-relaxed">
               Mulai perjalananmu bersama Travu hanya dengan login, pilih minat,
@@ -45,8 +46,13 @@ const LoginSection = () => {
 
         <style jsx>{`
           @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            0%,
+            100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-10px);
+            }
           }
           .animate-float {
             animation: float 4s ease-in-out infinite;

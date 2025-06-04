@@ -24,19 +24,19 @@ export function CardCustom({
   item = {},
 }) {
   const renderRating = () => (
-    <div className="flex items-center gap-2">
-      <div className="flex">
-        {Array(5)
-          .fill()
-          .map((_, i) => (
-            <StarIcon key={i} className="h-5 w-5 text-yellow-800" />
-          ))}
-      </div>
-      <Typography className="text-lg text-black font-normal">
-        ({rating})
-      </Typography>
+  <div className="flex items-center gap-2">
+    <div className="flex">
+      {Array(5)
+        .fill()
+        .map((_, i) => (
+          <StarIcon key={i} className="h-5 w-5 text-yellow-800" />
+        ))}
     </div>
-  );
+    <Typography variant="paragraph" className="text-lg text-black font-normal">
+      ({rating})
+    </Typography>
+  </div>
+);
 
   const renderLocation = () => (
     <div className="flex items-center gap-1">
