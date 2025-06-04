@@ -86,7 +86,7 @@ const KategoriSection = () => {
             <img
               src={gambarAktif[currentIndex]}
               alt={`Gambar ${kategoriAktif}`}
-              className="w-full h-64 object-cover rounded-2xl shadow-lg"
+              className="w-full h-64 rounded-2xl shadow-lg"
             />
             <button
               onClick={prevSlide}
@@ -108,7 +108,7 @@ const KategoriSection = () => {
           <div className="flex-shrink-0">
             <img
               src={gambarAktif[0]}
-              className="w-[580px] h-[400px] object-cover rounded-2xl shadow-lg"
+              className="w-[580px] h-[400px] rounded-2xl shadow-lg"
               alt="Gambar utama"
             />
           </div>
@@ -119,7 +119,7 @@ const KategoriSection = () => {
               <img
                 key={i}
                 src={img}
-                className="w-full h-[196px] object-cover rounded-2xl shadow-md"
+                className="w-full h-[196px] rounded-2xl shadow-md"
                 alt={`Gambar ${i + 2}`}
               />
             ))}
