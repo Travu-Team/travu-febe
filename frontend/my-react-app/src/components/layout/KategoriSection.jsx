@@ -6,9 +6,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const dataGambar = {
-  Pantai: ["/image/pantai1.png", "/image/pantai2.png"],
-  "Air Terjun": ["/image/airterjun1.png", "/image/airterjun2.png"],
-  Lainnya: ["/image/candi.png"],
+  Pantai: ["/image/pantai_sanur.jpg", "/image/pantai_anyer.jpg"],
+  "Air Terjun": ["/image/airterjun_madakaripura.webp", "/image/airterjun_kantolampo.webp"],
+  Lainnya: ["/image/pantai_sawarna.jpg"],
 };
 
 // Buat kategori "Semua" dari gabungan semua
