@@ -26,7 +26,7 @@ const InputField = ({
         <select
           id={id}
           name={id}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-gray-100 disabled:cursor-not-allowed"
+          className="bg-white text-black shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline disabled:bg-gray-100 disabled:cursor-not-allowed"
           value={value}
           onChange={onChange}
           disabled={disabled}
@@ -50,7 +50,7 @@ const InputField = ({
         type={type}
         id={id}
         name={id}
-        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-gray-100 disabled:cursor-not-allowed"
+       className="bg-white text-black shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline disabled:bg-gray-100 disabled:cursor-not-allowed"
         value={value}
         onChange={onChange}
         disabled={disabled}
@@ -80,27 +80,56 @@ const ProfileUser = () => {
   }, []);
 
   const fetchUserData = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch("http://localhost:5000/api/user/profile", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Mengambil token JWT dari localStorage
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Gagal mengambil data profil");
-      }
-      const data = await response.json();
-      setUserData(data);
-      setOriginalData(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  try {
+    setIsLoading(true);
 
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("Token tidak ditemukan. Silakan login kembali.");
+    }
+
+    const response = await fetch("http://localhost:5000/api/user/profile", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Tangani token yang sudah tidak berlaku
+    if (response.status === 401 || response.status === 403) {
+      toast.error("Sesi login telah berakhir. Silakan login kembali.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
+      localStorage.removeItem("token"); // Hapus token dari storage
+      window.location.href = "/login"; // Redirect ke halaman login
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error("Gagal mengambil data profil");
+    }
+
+    const data = await response.json();
+    setUserData(data);
+    setOriginalData(data);
+  } catch (err) {
+    toast.error(err.message || "Terjadi kesalahan saat mengambil data.", {
+      position: "top-center",
+      autoClose: 3000,
+    });
+    setError(err.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
   const handleInputChange = (e) => {
     const { id, value, name } = e.target;
     const fieldName = id || name; // fallback ke name jika id tidak ada

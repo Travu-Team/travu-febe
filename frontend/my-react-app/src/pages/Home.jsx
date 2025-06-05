@@ -13,7 +13,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { authService } from "../services/authService";
 import { jwtDecode } from "jwt-decode";
-import toast from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 
 function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -23,50 +23,21 @@ function Home() {
 
     if (token) {
       try {
-        jwtDecode(token);
-        setIsLoggedIn(true);
+        const decoded = jwtDecode(token);
+        const isTokenExpired = decoded.exp < Date.now() / 1000;
+
+        if (isTokenExpired) {
+          setIsLoggedIn(false);
+          authService.logout();
+        } else {
+          setIsLoggedIn(true);
+        }
       } catch {
         setIsLoggedIn(false);
+        authService.logout();
       }
     } else {
       setIsLoggedIn(false);
-
-      // Delay 1,8 detik lalu tampilkan toast
-      const timeoutId = setTimeout(() => {
-        toast(
-          (t) => (
-            <div className="flex items-start space-x-3">
-              <span className="text-xl">🔐</span>
-              <div className="text-sm">
-                <p className="font-medium">Login untuk akses penuh.</p>
-                <p className="text-xs text-gray-500">
-                  Scroll ke bawah untuk login.
-                </p>
-              </div>
-              <button
-                onClick={() => toast.dismiss(t.id)}
-                className="ml-auto text-[#d13a3a] text-xl font-bold leading-none"
-                aria-label="Close notification"
-              >
-                ×
-              </button>
-            </div>
-          ),
-          {
-            duration: 10000,
-            style: {
-              background: "#fff",
-              border: "1px solid #3a59d1",
-              padding: "14px 18px",
-              color: "#3a59d1",
-              borderRadius: "10px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-            },
-          }
-        );
-      }, 1800);
-
-      return () => clearTimeout(timeoutId);
     }
   }, []);
 

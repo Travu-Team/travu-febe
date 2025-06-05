@@ -44,12 +44,11 @@ const Navbar = () => {
     <nav className="w-full bg-white h-[60px] shadow-md z-50 relative">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-full">
         {/* Logo */}
-        <a href="/" className="flex items-center" aria-label="TRAVU Homepage">
-          <img
-            src="../../src/assets/img/travu-logo2.png"
-            alt="Logo TRAVU"
-            className="w-[100px] h-[40px] object-contain"
-          />
+        <a
+          href="/"
+          className="flex items-center text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-blue-600 mb-1 transition-all duration-300 hover:text-transparent hover:bg-[conic-gradient(from_256.62deg_at_50%_50%,#47bb8e_-33.72deg,#3a59d1_241.19deg,#47bb8e_326.28deg,#3a59d1_601.19deg)] hover:bg-clip-text"
+        >
+          TRAVU
         </a>
 
         {/* Right side (Desktop Navigation + Profile + Search) */}
@@ -114,7 +113,7 @@ const Navbar = () => {
                       href="/profile"
                       className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-gray-200 hover:text-gray-800 font-normal no-underline focus:outline-none"
                     >
-                      Settings
+                      Pengaturan
                     </a>
                   </li>
                   <li>
@@ -122,7 +121,7 @@ const Navbar = () => {
                       onClick={handleLogout}
                       className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-gray-200 hover:text-gray-800 font-normal focus:outline-none"
                     >
-                      Sign Out
+                      Keluar
                     </button>
                   </li>
                 </ul>
@@ -164,11 +163,19 @@ const Navbar = () => {
                   </li>
                   <hr className="my-2 border-gray-300" />
                   <li>
+                    <a
+                      href="/profile"
+                      className="w-full text-left block px-4 py-3 text-gray-900 hover:bg-gray-200 hover:text-gray-800 font-normal no-underline focus:outline-none"
+                    >
+                      Pengaturan
+                    </a>
+                  </li>
+                  <li>
                     <button
                       onClick={handleLogout}
                       className="w-full text-left block px-4 py-3 text-gray-900 hover:bg-gray-200"
                     >
-                      Sign Out
+                      Keluar
                     </button>
                   </li>
                 </ul>
