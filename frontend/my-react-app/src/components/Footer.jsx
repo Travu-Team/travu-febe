@@ -43,7 +43,7 @@ const Footer = () => {
                   />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-blue-600">TRAVU</h3>
+                  <p className="text-2xl font-bold text-blue-600">TRAVU</p>
                   <p className="text-xs text-gray-500 font-medium">
                     Travel With U
                   </p>
@@ -51,27 +51,31 @@ const Footer = () => {
               </div>
 
               <p className="text-gray-600 mb-6 leading-relaxed">
-                Temukan destinasi impian dan rencanakan perjalanan terbaik
-                bersama Travu. Wujudkan liburan yang tak terlupakan!
+                Lagi pengen adventure? Atau healing <br /> tipis-tipis? Sistem
+                rekomendasi kami siap jadi temen setia cari destinasi yang
+                sesuai vibe kamu. Gak perlu repot mikir, tinggal pilih aja!
               </p>
 
               {/* Social Media */}
               <div className="flex justify-center md:justify-start space-x-4">
                 <a
                   href="#"
-                  className="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-md"
+                  className="w-10 h-10 bg-blue-600  text-white hover:text-white focus:text-white visited:text-white
+                   rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-md"
                 >
                   <FontAwesomeIcon icon={faFacebook} />
                 </a>
                 <a
                   href="#"
-                  className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-md"
+                  className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white hover:text-white focus:text-white visited:text-white
+                  rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-md"
                 >
                   <FontAwesomeIcon icon={faInstagram} />
                 </a>
                 <a
                   href="#"
-                  className="w-10 h-10 bg-blue-400 hover:bg-blue-500 text-white rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-md"
+                  className="w-10 h-10 bg-blue-400 hover:bg-blue-500 text-white hover:text-white focus:text-white visited:text-white
+                  rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-md"
                 >
                   <FontAwesomeIcon icon={faTwitter} />
                 </a>
@@ -108,14 +112,6 @@ const Footer = () => {
                     Rencana Wisata
                   </a>
                 </li>
-                <li>
-                  <a
-                    href="/contact"
-                    className="text-gray-600 hover:text-blue-600 transition-colors duration-200"
-                  >
-                    Kontak
-                  </a>
-                </li>
               </ul>
             </div>
 
@@ -130,7 +126,7 @@ const Footer = () => {
                     icon={faEnvelope}
                     className="w-4 h-4 mr-3 text-blue-500"
                   />
-                  <span className="text-sm">info@travu.com</span>
+                  <span className="text-sm">travuwithyouuu@gmail.com</span>
                 </div>
                 <div className="flex items-center justify-center md:justify-start text-gray-600">
                   <FontAwesomeIcon
@@ -151,21 +147,24 @@ const Footer = () => {
               {/* Newsletter */}
               <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
                 <h5 className="text-sm font-semibold text-gray-800 mb-2">
-                  Newsletter
+                  Ikuti Instagram Kami
                 </h5>
                 <p className="text-xs text-gray-600 mb-3">
-                  Tambah destinasi terbaru! Silahkan Hubungi
+                  Ingin selalu update dengan destinasi terbaru? Follow akun
+                  Instagram kami! Jika kamu memiliki rekomendasi tempat wisata
+                  menarik, jangan ragu untuk DM langsung ke akun kami.Atau bisa
+                  melalui email kami.
                 </p>
-                <div className="flex">
-                  <input
-                    type="email"
-                    placeholder="Email..."
-                    className="flex-1 px-3 py-2 text-xs bg-white border border-gray-200 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-r-md transition-colors duration-200">
-                    <FontAwesomeIcon icon={faEnvelope} />
-                  </button>
-                </div>
+                <a
+                  href="https://www.instagram.com/dicoding/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 bg-pink-600 text-white hover:text-white focus:text-white visited:text-white                  
+                  text-xs font-medium rounded-md transition-transform duration-200 transform hover:scale-105"
+                >
+                  <FontAwesomeIcon icon={faInstagram} className="mr-2" />
+                  Follow @dicoding
+                </a>
               </div>
             </div>
           </div>
