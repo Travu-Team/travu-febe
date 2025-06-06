@@ -16,7 +16,7 @@ const InputField = ({
   disabled = false,
   options = [],
 }) => {
-  // Jika type adalah select, render dropdown
+
   if (type === "select") {
     return (
       <div className="mb-4">
@@ -248,10 +248,10 @@ const ProfileUser = () => {
               />
               <InputField
                 id="address"
-                label="Domisili"
+                label="Lokasi Destinasi"
                 type="select"
                 options={[
-                  { value: "", label: "Pilih Domisili" },
+                  { value: "", label: "Lokasi Destinasi" },
                   { value: "Aceh", label: "Aceh" },
                   { value: "Sumatera Utara", label: "Sumatera Utara" },
                   { value: "Sumatera Barat", label: "Sumatera Barat" },
