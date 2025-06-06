@@ -1,13 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import classNames from "classnames";
+import "../../../src/index.css"; 
 
 const dataGambar = {
-  Pantai: ["/image/pantai_sanur.jpg", "/image/pantai_anyer.jpg"],
-  "Air Terjun": ["/image/airterjun_madakaripura.webp", "/image/airterjun_kantolampo.webp"],
+  Pantai: [
+    "/image/pantai_sanur.jpg",
+    "/image/pantai_anyer.jpg",
+    "/image/pantai_sanur.jpg",
+    "/image/pantai_anyer.jpg",
+    "/image/pantai_anyer.jpg",
+  ],
+  "Air Terjun": [
+    "/image/airterjun_madakaripura.webp",
+    "/image/airterjun_kantolampo.webp",
+  ],
   Lainnya: ["/image/pantai_sawarna.jpg"],
 };
 
@@ -22,6 +30,8 @@ const KategoriSection = () => {
   const [kategoriAktif, setKategoriAktif] = useState("Pantai");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [isContentVisible, setIsContentVisible] = useState(true); 
+  const animationTimeout = useRef(null); 
 
   const gambarAktif = dataGambar[kategoriAktif];
 
@@ -33,6 +43,29 @@ const KategoriSection = () => {
     window.addEventListener("resize", checkScreenSize);
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
+
+  // Trigger animasi saat kategori berubah
+  useEffect(() => {
+    // Bersihkan timeout sebelumnya
+    if (animationTimeout.current) {
+      clearTimeout(animationTimeout.current);
+    }
+
+    // Sembunyikan konten sementara
+    setIsContentVisible(false);
+
+    // Atur ulang animasi setelah delay
+    animationTimeout.current = setTimeout(() => {
+      setIsContentVisible(true);
+    }, 50); // Delay kecil untuk memastikan animasi terpicu
+
+    // Bersihkan saat unmount
+    return () => {
+      if (animationTimeout.current) {
+        clearTimeout(animationTimeout.current);
+      }
+    };
+  }, [kategoriAktif]);
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % gambarAktif.length);
@@ -81,22 +114,25 @@ const KategoriSection = () => {
 
       {/* Gambar */}
       {isMobile ? (
-        <div className=" pt-6 ">
+        <div className="pt-6">
           <div className="relative w-full max-w-sm mx-auto">
             <img
               src={gambarAktif[currentIndex]}
               alt={`Gambar ${kategoriAktif}`}
-              className="w-full h-64 rounded-2xl shadow-lg"
+              className={classNames(
+                "w-full h-64 rounded-2xl shadow-lg",
+                isContentVisible ? "animate-fade-in" : "opacity-0"
+              )}
             />
             <button
               onClick={prevSlide}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-md text-gray-600 hover:bg-gray-100"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 bg-[#3A59D1] text-white p-3 rounded-full shadow-md hover:bg-[#2a449b] transition"
             >
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
             <button
               onClick={nextSlide}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-md text-gray-600 hover:bg-gray-100"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 z-10 bg-[#3A59D1] text-white p-3 rounded-full shadow-md hover:bg-[#2a449b] transition"
             >
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
@@ -108,18 +144,24 @@ const KategoriSection = () => {
           <div className="flex-shrink-0">
             <img
               src={gambarAktif[0]}
-              className="w-[580px] h-[400px] rounded-2xl shadow-lg"
+              className={classNames(
+                "w-[640px] h-[410px] rounded-2xl shadow-lg",
+                isContentVisible ? "animate-fade-in" : "opacity-0"
+              )}
               alt="Gambar utama"
             />
           </div>
 
           {/* Grid Gambar Kecil */}
-          <div className="grid grid-cols-2 gap-3 w-[480px]">
+          <div className="grid grid-cols-2 gap-3 w-[560px]">
             {gambarAktif.slice(1).map((img, i) => (
               <img
                 key={i}
                 src={img}
-                className="w-full h-[196px] rounded-2xl shadow-md"
+                className={classNames(
+                  "w-full h-[196px] rounded-2xl shadow-md",
+                  isContentVisible ? "animate-fade-in" : "opacity-0"
+                )}
                 alt={`Gambar ${i + 2}`}
               />
             ))}

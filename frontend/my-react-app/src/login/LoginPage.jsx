@@ -33,17 +33,22 @@ const LoginPage = () => {
       const response = await authService.login({
         email: formData.email,
         password: formData.password,
-        rememberMe: formData.rememberMe
+        rememberMe: formData.rememberMe,
       });
 
       if (response.token) {
         // Token akan disimpan oleh authService berdasarkan rememberMe
         navigate("/");
       } else {
-        setErrorMessage(data.message || "Login gagal, periksa kembali email dan password.");
+        const errorData = await response.json(); // Properly get the error data
+        setErrorMessage(
+          errorData.message ||
+            "Login gagal, periksa kembali email dan password."
+        );
       }
     } catch (error) {
       setErrorMessage("Terjadi kesalahan saat menghubungi server.");
+      console.error("Error details:", error); // Now the error variable is used
     }
   };
 
@@ -60,11 +65,16 @@ const LoginPage = () => {
         <div className="max-w-md w-full bg-white bg-opacity-90 p-6 rounded-lg shadow-lg">
           {/* Judul */}
           <h2 className="text-3xl font-semibold text-center text-gray-900">
-            Selamat datang kembali di <span className="text-blue-600">Travu</span>
+            Selamat datang kembali di{" "}
+            <span className="text-blue-600">Travu</span>
           </h2>
 
           {/* Pesan Kesalahan */}
-          {errorMessage && <p className="text-red-500 text-sm text-center mt-2">{errorMessage}</p>}
+          {errorMessage && (
+            <p className="text-red-500 text-sm text-center mt-2">
+              {errorMessage}
+            </p>
+          )}
 
           {/* Form */}
           <form className="space-y-6 mt-4" onSubmit={handleSubmit}>
