@@ -80,7 +80,7 @@ const RegisterPage = () => {
       {/* Background Gambar */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/image/background-register.jpg')" }}
+        style={{ backgroundImage: "url('/image/background_register.jpg')" }}
       />
 
       {/* Form Section */}

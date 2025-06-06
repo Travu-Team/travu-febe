@@ -57,7 +57,7 @@ const LoginPage = () => {
       {/* Background Gambar */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/image/background-login.jpg')" }}
+        style={{ backgroundImage: "url('/image/background_login.jpg')" }}
       />
 
       {/* Form Section */}
