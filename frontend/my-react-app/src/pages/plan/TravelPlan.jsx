@@ -10,6 +10,7 @@ const TravelPlan = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false); // Add this state
+  const [localPlans, setLocalPlans] = useState([]); // State baru untuk data IndexedDB
 
   useEffect(() => {
     // Fetch travel plans from backend API instead of CSV
@@ -39,6 +40,52 @@ const TravelPlan = () => {
     fetchPlans();
   }, []);
 
+  // Fungsi untuk mengambil data dari IndexedDB
+  const ambilDataDariIndexedDB = () => {
+    const request = indexedDB.open('travelPlanDB', 2);
+
+    request.onerror = (event) => {
+      console.error('Error membuka IndexedDB:', event.target.error);
+    };
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('rencanaWisata')) {
+        db.createObjectStore('rencanaWisata', { keyPath: 'id', autoIncrement: true });
+      }
+    };
+
+    request.onsuccess = (event) => {
+      try {
+        const db = event.target.result;
+        const transaction = db.transaction(['rencanaWisata'], 'readonly');
+        const store = transaction.objectStore('rencanaWisata');
+        const getAll = store.getAll();
+
+        getAll.onsuccess = () => {
+          setLocalPlans(getAll.result || []);
+        };
+
+        transaction.oncomplete = () => {
+          db.close();
+        };
+      } catch (error) {
+        console.error('Error mengambil data:', error);
+        setLocalPlans([]);
+      }
+    };
+  };
+
+  // Memanggil fungsi saat komponen dimount
+  useEffect(() => {
+    ambilDataDariIndexedDB();
+  }, []);
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    ambilDataDariIndexedDB(); // Refresh data setelah modal ditutup
+  };
+
   return (
     <>
       <div className="min-h-screen w-full bg-white">
@@ -61,7 +108,8 @@ const TravelPlan = () => {
           {/* Add Modal Form Component */}
           <TravelPlanForm
             visible={isModalVisible}
-            onClose={() => setIsModalVisible(false)}
+            onClose={closeModal} // Gunakan closeModal sebagai handler
+            onSuccess={ambilDataDariIndexedDB}
           />
 
           {/* Handling Loading & Error States */}
@@ -109,6 +157,32 @@ const TravelPlan = () => {
               ))}
             </div>
           )}
+
+          {/* Tampilkan data dari IndexedDB */}
+          <div className="mt-8">
+            <h2 className="text-xl font-bold mb-4">Rencana Tersimpan Lokal</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {localPlans.map((plan, index) => (
+                <div key={index} className="border rounded-lg p-4 bg-white shadow">
+                  <h3 className="font-bold text-lg">{plan.namaRencana}</h3>
+                  <p className="text-gray-600">
+                    Tanggal: {new Date(plan.tanggal).toLocaleDateString()}
+                  </p>
+                  <div className="mt-2">
+                    <p className="font-semibold">Destinasi:</p>
+                    <ul className="list-disc ml-4">
+                      {plan.destinasi.map((dest, idx) => (
+                        <li key={idx}>{dest.nama_wisata}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Dibuat: {new Date(plan.waktuDibuat).toLocaleDateString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </main>
 
         <footer>

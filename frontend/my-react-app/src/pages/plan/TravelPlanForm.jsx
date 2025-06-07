@@ -4,7 +4,7 @@ import Papa from 'papaparse';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
-const TravelPlanForm = ({ visible, onClose }) => {
+const TravelPlanForm = ({ visible, onClose}) => {
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -30,6 +30,37 @@ const TravelPlanForm = ({ visible, onClose }) => {
         });
     }
   }, [visible]);
+
+  // Inisialisasi IndexedDB
+  useEffect(() => {
+    const initDB = () => {
+      const request = indexedDB.open('travelPlanDB', 2); // Increment version number
+      
+      request.onerror = (event) => {
+        console.error('Error membuka IndexedDB:', event.target.error);
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        // Create object store if it doesn't exist
+        if (!db.objectStoreNames.contains('rencanaWisata')) {
+          db.createObjectStore('rencanaWisata', { keyPath: 'id', autoIncrement: true });
+          console.log('Object store rencanaWisata created');
+        }
+      };
+
+      request.onsuccess = () => {
+        console.log('IndexedDB initialized successfully');
+      };
+    };
+
+    initDB();
+    return () => {
+      // Cleanup when component unmounts
+      const request = indexedDB.deleteDatabase('travelPlanDB');
+      request.onsuccess = () => console.log('Database cleaned up');
+    };
+  }, []);
 
   const handleAddItem = (item) => {
     if (!travelPlan.name || !travelPlan.date) {
@@ -73,6 +104,51 @@ const TravelPlanForm = ({ visible, onClose }) => {
     }
   }, [selectedProvince, selectedCategory, wisataData]);
 
+  // Fungsi untuk menyimpan ke IndexedDB
+  const simpanKeIndexedDB = async (data) => {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('travelPlanDB', 2);
+
+      request.onerror = () => reject(request.error);
+      
+      request.onsuccess = (event) => {
+        try {
+          const db = event.target.result;
+          const transaction = db.transaction(['rencanaWisata'], 'readwrite');
+          const store = transaction.objectStore('rencanaWisata');
+
+          const addRequest = store.add({
+            ...data,
+            waktuDibuat: new Date().toISOString()
+          });
+
+          addRequest.onsuccess = () => resolve();
+          addRequest.onerror = () => reject(addRequest.error);
+
+          transaction.oncomplete = () => {
+            db.close();
+          };
+        } catch (error) {
+          reject(error);
+        }
+      };
+    });
+  };
+
+  // Reset form state when modal closes
+  useEffect(() => {
+    if (!visible) {
+      setTravelPlan({
+        name: '',
+        date: '',
+        items: []
+      });
+      setSelectedProvince('');
+      setSelectedCategory('');
+      setSearchResults([]);
+    }
+  }, [visible]);
+
   const handleSubmitPlan = async () => {
     if (!travelPlan.name || !travelPlan.date || travelPlan.items.length === 0) {
       alert('Harap isi semua data dan pilih minimal 1 tempat wisata!');
@@ -81,34 +157,17 @@ const TravelPlanForm = ({ visible, onClose }) => {
 
     setIsSubmitting(true);
     try {
-      const userData = JSON.parse(localStorage.getItem('userData'));
-      
-      const response = await fetch('http://localhost:5000/api/plan', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userData?.token}`
-        },
-        body: JSON.stringify({
-          userId: userData?.id,
-          planName: travelPlan.name,
-          travelDate: travelPlan.date,
-          destinations: travelPlan.items
-        })
+      await simpanKeIndexedDB({
+        planName: travelPlan.name,
+        travelDate: travelPlan.date,
+        destinations: travelPlan.items
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Gagal menyimpan rencana perjalanan');
-      }
-
-      await response.json();
       alert('Rencana perjalananmu berhasil disimpan!');
       onClose();
-      
     } catch (error) {
-      console.error('Error submitting plan:', error);
-      alert(error.message || 'Terjadi kesalahan saat menyimpan');
+      console.error('Error:', error);
+      alert('Terjadi kesalahan saat menyimpan data');
     } finally {
       setIsSubmitting(false);
     }
@@ -117,7 +176,10 @@ const TravelPlanForm = ({ visible, onClose }) => {
   return (
     <Modal
       open={visible}
-      onCancel={onClose}
+      onCancel={() => {
+        setIsSubmitting(false); // Reset submitting state
+        onClose();
+      }}
       width={1200}
       title="Tambah Rencana Wisata"
       footer={null}
