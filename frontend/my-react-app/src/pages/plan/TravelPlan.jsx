@@ -1,29 +1,42 @@
 import { useEffect, useState } from "react";
-import Papa from "papaparse";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
+import TravelPlanForm from "./TravelPlanForm";
 
 const TravelPlan = () => {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false); // Add this state
 
   useEffect(() => {
-    fetch("/data/travel-plans.csv")
-      .then((res) => res.text())
-      .then((data) => {
-        const result = Papa.parse(data, { header: true, skipEmptyLines: true });
-        setPlans(result.data);
+    // Fetch travel plans from backend API instead of CSV
+    const fetchPlans = async () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        const response = await fetch('http://localhost:5000/api/travel-plans', {
+          headers: {
+            'Authorization': `Bearer ${userData?.token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch travel plans');
+        }
+        const data = await response.json();
+        setPlans(data);
         setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching CSV:", err);
-        setError("Gagal mengambil data perjalanan.");
+      } catch (err) {
+        console.error("Error fetching plans:", err);
+        setError("Gagal mengambil data rencana perjalananmu");
         setLoading(false);
-      });
+      }
+    };
+
+    fetchPlans();
   }, []);
 
   return (
@@ -37,10 +50,19 @@ const TravelPlan = () => {
           {/* Header Section */}
           <div className="max-w-4xl mx-auto flex justify-between items-center mt-10">
             <h1 className="text-primary text-3xl font-semibold">Travel Plan</h1>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 flex items-center gap-2">
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 flex items-center gap-2"
+              onClick={() => setIsModalVisible(true)} // Add this onClick handler
+            >
               ➕ Tambah Rencana Wisata
             </button>
           </div>
+
+          {/* Add Modal Form Component */}
+          <TravelPlanForm
+            visible={isModalVisible}
+            onClose={() => setIsModalVisible(false)}
+          />
 
           {/* Handling Loading & Error States */}
           {loading && (

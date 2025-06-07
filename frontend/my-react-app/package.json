@@ -17,6 +17,8 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@heroicons/react": "^2.2.0",
     "@material-tailwind/react": "^2.1.10",
+    "antd": "^5.25.4",
+    "d3": "^7.9.0",
     "framer-motion": "^12.14.0",
     "jwt-decode": "^4.0.0",
     "papaparse": "^5.5.2",
