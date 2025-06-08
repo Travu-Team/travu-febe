@@ -10,6 +10,7 @@ const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const forgotPasswordRoutes = require('./routes/forgotPasswordRoutes');
 const resetPasswordRoutes = require('./routes/resetPasswordRoutes');
+const travelPlanRoutes = require('./routes/travelPlanRoutes');
 
 const init = async () => {
   const server = Hapi.server({
@@ -17,9 +18,26 @@ const init = async () => {
     host: 'localhost',
     routes: {
       cors: {
-        origin: ['*'],
+        origin: ['http://localhost:5173'],
+        credentials: true,
+        headers: ['Accept', 'Authorization', 'Content-Type', 'If-None-Match'],
+        additionalHeaders: ['X-Requested-With'],
+        exposedHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+        maxAge: 86400
       },
     },
+  });
+
+  // Add OPTIONS handler for preflight requests
+  server.route({
+    method: 'OPTIONS',
+    path: '/{any*}',
+    handler: (request, h) => {
+      return h.response().code(200);
+    },
+    options: {
+      auth: false
+    }
   });
 
   // Register JWT plugin
@@ -50,6 +68,7 @@ const init = async () => {
     ...profileRoutes,
     ...forgotPasswordRoutes,
     ...resetPasswordRoutes,
+    ...travelPlanRoutes
   ]);
 
   // Test database connection
