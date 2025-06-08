@@ -34,7 +34,7 @@ const TravelPlanForm = ({ visible, onClose}) => {
   // Inisialisasi IndexedDB
   useEffect(() => {
     const initDB = () => {
-      const request = indexedDB.open('travelPlanDB', 2); // Increment version number
+      const request = indexedDB.open('travelPlanDB', 2); // Ubah ke versi 2
       
       request.onerror = (event) => {
         console.error('Error membuka IndexedDB:', event.target.error);
@@ -107,7 +107,7 @@ const TravelPlanForm = ({ visible, onClose}) => {
   // Fungsi untuk menyimpan ke IndexedDB
   const simpanKeIndexedDB = async (data) => {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('travelPlanDB', 2);
+      const request = indexedDB.open('travelPlanDB', 2); // Ubah ke versi 2
 
       request.onerror = () => reject(request.error);
       
@@ -162,6 +162,16 @@ const TravelPlanForm = ({ visible, onClose}) => {
         travelDate: travelPlan.date,
         destinations: travelPlan.items
       });
+
+      // Reset form
+      setTravelPlan({
+        name: '',
+        date: '',
+        items: []
+      });
+      setSelectedProvince('');
+      setSelectedCategory('');
+      setSearchResults([]);
 
       alert('Rencana perjalananmu berhasil disimpan!');
       onClose();
