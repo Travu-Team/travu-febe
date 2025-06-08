@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Papa from "papaparse";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 
 const DestinasiDetail = () => {
   const { placeName } = useParams();

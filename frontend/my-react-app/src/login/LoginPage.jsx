@@ -36,7 +36,7 @@ const LoginPage = () => {
       const response = await authService.login({
         email: formData.email,
         password: formData.password,
-        rememberMe: formData.rememberMe
+        rememberMe: formData.rememberMe,
       });
 
       if (response.token) {
@@ -58,7 +58,9 @@ const LoginPage = () => {
       {/* Background Gambar */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('./image/background-login.jpg')" }}
+        style={{
+          backgroundImage: "url('../public/image/background-login.jpg')",
+        }}
       />
 
       {/* Form Section */}
@@ -66,11 +68,16 @@ const LoginPage = () => {
         <div className="max-w-md w-full bg-white bg-opacity-90 p-6 rounded-lg shadow-lg">
           {/* Judul */}
           <h2 className="text-3xl font-semibold text-center text-gray-900">
-            Selamat datang kembali di <span className="text-blue-600">Travu</span>
+            Selamat datang kembali di{" "}
+            <span className="text-blue-600">Travu</span>
           </h2>
 
           {/* Pesan Kesalahan */}
-          {errorMessage && <p className="text-red-500 text-sm text-center mt-2">{errorMessage}</p>}
+          {errorMessage && (
+            <p className="text-red-500 text-sm text-center mt-2">
+              {errorMessage}
+            </p>
+          )}
 
           {/* Form */}
           <form className="space-y-6 mt-4" onSubmit={handleSubmit}>
@@ -123,7 +130,9 @@ const LoginPage = () => {
               </label>
               <span
                 onClick={() => !isLoading && navigate("/forgot-password")}
-                className={`text-sm text-blue-600 hover:text-blue-800 cursor-pointer ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`text-sm text-blue-600 hover:text-blue-800 cursor-pointer ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 Lupa Kata Sandi?
               </span>
@@ -144,7 +153,9 @@ const LoginPage = () => {
             Belum Punya Akun?{" "}
             <span
               onClick={() => !isLoading && navigate("/register")}
-              className={`text-blue-600 font-semibold cursor-pointer hover:text-blue-800 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`text-blue-600 font-semibold cursor-pointer hover:text-blue-800 ${
+                isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               Daftar Disini
             </span>

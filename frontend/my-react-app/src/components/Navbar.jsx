@@ -4,14 +4,15 @@ import { faSearch, faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { authService } from "../services/authService";
 import { apiClient, API_CONFIG } from "../services/apiConfig";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // Tambahkan useLocation untuk highlight active link
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const navigate = useNavigate(); // Hook untuk navigasi
+  const navigate = useNavigate();
+  const location = useLocation(); // Untuk highlight active link
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
 
@@ -91,8 +92,8 @@ const Navbar = () => {
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter" && searchQuery.trim() !== "") {
       navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
-      setIsSearchOpen(false); // tutup search bar
-      setSearchQuery(""); // reset input
+      setIsSearchOpen(false); // Tutup search bar
+      // Tidak reset searchQuery agar URL tetap mencerminkan pencarian
     }
   };
 
@@ -184,7 +185,7 @@ const Navbar = () => {
           <button
             onClick={() => setIsSearchOpen(!isSearchOpen)}
             aria-label="Toggle search"
-            className="w-10 h-10 bg-[#3a59d1] text-white rounded-full flex items-center justify-center "
+            className="w-10 h-10 bg-[#3a59d1] text-white rounded-full flex items-center justify-center"
           >
             <FontAwesomeIcon icon={faSearch} />
           </button>
@@ -280,13 +281,13 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-[60px] left-0 w-full bg-white shadow-lg z-40">
-          <ul className="flex flex-col px-4 py-2 space-y-2 ">
+          <ul className="flex flex-col px-4 py-2 space-y-2">
             <li>
               <a
                 href="/"
-                className="block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded "
+                className="block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded"
               >
-                Home
+                Beranda
               </a>
             </li>
             <li>

@@ -10,17 +10,19 @@ import {
   faArrowLeft,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom"; // Tambahkan useSearchParams
 
 const Search = () => {
   const [data, setData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("Pantai");
+  const [searchTerm, setSearchTerm] = useState("");
   const [filtered, setFiltered] = useState([]);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams(); // Untuk membaca dan mengatur parameter URL
 
   const csvFilePath = "/src/data/wisata_indonesia_final_fix.csv";
 
   useEffect(() => {
+    // Muat data CSV
     Papa.parse(csvFilePath, {
       download: true,
       header: true,
@@ -33,6 +35,14 @@ const Search = () => {
   }, []);
 
   useEffect(() => {
+    // Inisialisasi searchTerm dari URL saat pertama kali dimuat
+    const queryParam = searchParams.get("query");
+    if (queryParam && !searchTerm) {
+      const decodedQuery = decodeURIComponent(queryParam).trim();
+      setSearchTerm(decodedQuery); // Set hanya jika searchTerm masih kosong
+    }
+
+    // Filter data berdasarkan searchTerm
     const filteredData = data.filter((item) => {
       const namaWisata = item.nama_wisata?.toLowerCase() || "";
       return namaWisata.includes(searchTerm.toLowerCase());
@@ -40,10 +50,16 @@ const Search = () => {
 
     console.log("🎯 Filtered:", filteredData.length, "results");
     setFiltered(filteredData);
-  }, [data, searchTerm]);
+  }, [data, searchParams, searchTerm]); // Tambahkan searchParams untuk inisialisasi awal
+
+  const handleSearchSubmit = (e) => {
+    if (e.key === "Enter" && searchTerm.trim() !== "") {
+      setSearchParams({ query: encodeURIComponent(searchTerm.trim()) }); // Perbarui URL dengan query baru
+    }
+  };
 
   const handleBack = () => {
-    navigate(-1); // Navigate back to previous page
+    navigate("/"); // Navigate to home page
   };
 
   return (
@@ -78,6 +94,7 @@ const Search = () => {
                 placeholder="Cari tempat wisata..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleSearchSubmit} // Trigger search on Enter
               />
             </div>
           </div>
@@ -114,7 +131,7 @@ const Search = () => {
 
                     {/* Content */}
                     <div className="p-4">
-                      {/* Kategori  */}
+                      {/* Kategori */}
                       <span className="inline-block text-xs bg-blue-50 text-blue-700 font-medium px-2.5 py-1 rounded-full mb-2">
                         {item.kategori
                           ? item.kategori.charAt(0).toUpperCase() +
@@ -170,12 +187,8 @@ const Search = () => {
                           onClick={() =>
                             navigate(
                               `/destinasi/${encodeURIComponent(
-                                item.nama_wisata
-                                  ? item.nama_wisata
-                                      .toLowerCase()
-                                      .replace(/\s+/g, "-")
-                                  : "tidak-ditemukan"
-                              )}`
+                                item.nama_wisata || "tidak-ditemukan"
+                              ).toLowerCase()}`
                             )
                           }
                           className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
