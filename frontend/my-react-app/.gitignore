@@ -1,3 +1,6 @@
+# Menambahkan folder service agar tidak terdeploy
+service/
+
 # Logs
 logs
 *.log
@@ -7,6 +10,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependensi dan hasil build
 node_modules
 dist
 dist-ssr

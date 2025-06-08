@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { authService } from "../services/authService";
+import { apiClient, API_CONFIG } from "../services/apiConfig";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
@@ -12,17 +13,24 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate(); // Hook untuk navigasi
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
 
   useEffect(() => {
     const token = authService.getToken();
     if (token) {
       try {
         const decoded = jwtDecode(token);
+        // Set user data from token first for initial display
         setUser({
-          username: decoded.nama,
-          email: decoded.email,
+          username: decoded.nama || decoded.name || decoded.username || "User",
+          email: decoded.email || "",
+          nickname: decoded.nickname || "",
         });
-      } catch {
+        
+        // Fetch full profile data from API
+        fetchUserProfile();
+      } catch (error) {
+        console.error("Token decode error:", error);
         setUser(null);
       }
     } else {
@@ -30,17 +38,54 @@ const Navbar = () => {
     }
   }, []);
 
+  const fetchUserProfile = async () => {
+    try {
+      setIsLoadingProfile(true);
+      const response = await apiClient.get(API_CONFIG.ENDPOINTS.PROFILE);
+      
+      if (response.success && response.data) {
+        setUser(prevUser => ({
+          ...prevUser,
+          username: response.data.name || response.data.username || "User",
+          nickname: response.data.nickname || "",
+          email: response.data.email || prevUser?.email || "",
+        }));
+      }
+    } catch (error) {
+      console.warn("Failed to fetch user profile:", error);
+      // Keep existing user data from token if API call fails
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
+
   const handleLogout = () => {
-    authService.removeToken();
+    authService.clearToken();
     setUser(null);
     window.location.href = "/login";
   };
 
   const getInitials = (name) => {
-    if (!name) return "";
+    if (!name || typeof name !== 'string') return "U";
     const names = name.trim().split(" ");
     if (names.length === 1) return names[0][0].toUpperCase();
-    return (names[0][0] + names[1][0]).toUpperCase();
+    return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+  };
+
+  // Get display name prioritizing nickname
+  const getDisplayName = (user) => {
+    if (!user) return "User";
+    
+    // Prioritize nickname if available, otherwise use first name from username
+    if (user.nickname && user.nickname.trim()) {
+      return user.nickname.trim();
+    }
+    
+    if (user.username && typeof user.username === 'string') {
+      return user.username.trim().split(" ")[0];
+    }
+    
+    return "User";
   };
 
   const handleSearchKeyDown = (e) => {
@@ -55,11 +100,12 @@ const Navbar = () => {
     <nav className="w-full bg-white h-[60px] shadow-md z-50 relative">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-full">
         {/* Logo */}
-        <a
-          href="/"
-          className="flex items-center text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-blue-600 mb-1 transition-all duration-300 hover:text-transparent hover:bg-[conic-gradient(from_256.62deg_at_50%_50%,#47bb8e_-33.72deg,#3a59d1_241.19deg,#47bb8e_326.28deg,#3a59d1_601.19deg)] hover:bg-clip-text"
-        >
-          TRAVU
+        <a href="/" className="flex items-center" aria-label="TRAVU Homepage">
+          <img
+            src="../../src/assets/img/travu-logo2.png"
+            alt="Logo TRAVU"
+            className="w-[100px] h-[40px] object-contain"
+          />
         </a>
 
         {/* Right side (Desktop Navigation + Profile + Search) */}
@@ -67,7 +113,7 @@ const Navbar = () => {
           <a
             href="/"
             className={`text-[#6a7bd9] ${
-              location.pathname === "/" ? "font-bold" : ""
+              window.location.pathname === "/" ? "font-bold" : ""
             } hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
           >
             Beranda
@@ -75,7 +121,7 @@ const Navbar = () => {
           <a
             href="/about"
             className={`text-[#6a7bd9] ${
-              location.pathname === "/about" ? "font-bold" : ""
+              window.location.pathname === "/about" ? "font-bold" : ""
             } hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
           >
             Tentang Kami
@@ -83,7 +129,7 @@ const Navbar = () => {
           <a
             href="/plan"
             className={`text-[#6a7bd9] ${
-              location.pathname === "/plan" ? "font-bold" : ""
+              window.location.pathname === "/plan" ? "font-bold" : ""
             } hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
           >
             Rencana Wisata
@@ -97,34 +143,28 @@ const Navbar = () => {
                 className="flex items-center bg-[#3a59d1] text-white border font-semibold rounded-full px-4 py-1 shadow-md hover:ring-2 hover:ring-blue-400 transition"
                 aria-haspopup="true"
                 aria-expanded={isProfileDropdownOpen}
+                disabled={isLoadingProfile}
               >
                 <div className="w-9 h-9 rounded-full bg-white p-[2px] mr-2">
                   <img
                     src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      getInitials(user.username)
+                      getInitials(user.nickname || user.username)
                     )}&background=3a59d1&bold=true&color=fff`}
                     alt="Avatar"
                     className="w-full h-full rounded-full"
                   />
                 </div>
-                Hai, {user.username.split(" ")[0]}!
+                {isLoadingProfile ? "Loading..." : `Hai, ${getDisplayName(user)}!`}
               </button>
 
               {isProfileDropdownOpen && (
                 <ul className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-50">
-                  {/* <li className="px-4 py-2 text-gray-800 break-words">
-                      {user.username}
-                    </li>
-                    <li className="px-4 my-0 text-gray-800 break-words">
-                      {user.email}
-                    </li>
-                    <hr className="my-2 border-gray-300" /> */}
                   <li>
                     <a
                       href="/profile"
                       className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-gray-200 hover:text-gray-800 font-normal no-underline focus:outline-none"
                     >
-                      Pengaturan
+                      Settings
                     </a>
                   </li>
                   <li>
@@ -132,7 +172,7 @@ const Navbar = () => {
                       onClick={handleLogout}
                       className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-gray-200 hover:text-gray-800 font-normal focus:outline-none"
                     >
-                      Keluar
+                      Sign Out
                     </button>
                   </li>
                 </ul>
@@ -160,14 +200,15 @@ const Navbar = () => {
                 className="w-10 h-10 bg-[#3a59d1] text-white rounded-full flex items-center justify-center font-semibold focus:outline-none focus:ring-2 focus:ring-blue-300 hover:ring-2 hover:ring-blue-400 transition"
                 aria-haspopup="true"
                 aria-expanded={isProfileDropdownOpen}
+                disabled={isLoadingProfile}
               >
-                {getInitials(user.username)}
+                {isLoadingProfile ? "..." : getInitials(user.nickname || user.username)}
               </button>
 
               {isProfileDropdownOpen && (
                 <ul className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-50">
                   <li className="px-4 py-2 text-gray-800 break-words">
-                    {user.username}
+                    {getDisplayName(user)}
                   </li>
                   <li className="px-4 my-0 text-gray-800 break-words">
                     {user.email}
@@ -176,9 +217,9 @@ const Navbar = () => {
                   <li>
                     <a
                       href="/profile"
-                      className="w-full text-left block px-4 py-3 text-gray-900 hover:bg-gray-200 hover:text-gray-800 font-normal no-underline focus:outline-none"
+                      className="w-full text-left block px-4 py-3 text-gray-900 hover:bg-gray-200"
                     >
-                      Pengaturan
+                      Settings
                     </a>
                   </li>
                   <li>
@@ -186,7 +227,7 @@ const Navbar = () => {
                       onClick={handleLogout}
                       className="w-full text-left block px-4 py-3 text-gray-900 hover:bg-gray-200"
                     >
-                      Keluar
+                      Sign Out
                     </button>
                   </li>
                 </ul>
@@ -219,7 +260,7 @@ const Navbar = () => {
 
       {/* Search Bar */}
       {isSearchOpen && (
-        <div className="absolute top-[60px] left-1/2 transform -translate-x-1/2 w-full max-w-md px-4 z-40 mt-3yy">
+        <div className="absolute top-[60px] left-1/2 transform -translate-x-1/2 w-full max-w-md px-4 z-40 mt-3">
           <input
             type="text"
             value={searchQuery}
