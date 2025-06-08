@@ -1,228 +1,194 @@
-import React, { useState, useRef, useEffect } from "react";
-import classNames from "classnames";
-import "../../../src/index.css";
-
-const allData = [
-  {
-    nama: "Pantai Gili Trawangan",
-    lokasi: "Nusa Tenggara Barat, Indonesia",
-    gambar: "/image/pantai_gilitrawangan.jpg",
-    kategori: "pantai",
-  },
-  {
-    nama: "Pantai Laguna",
-    lokasi: "Lampung, Indonesia",
-    gambar: "/image/pantai_laguna.jpg",
-    kategori: "pantai",
-  },
-  {
-    nama: "Pantai Sanur",
-    lokasi: "Bali, Indonesia",
-    gambar: "/image/pantai_sanur.jpg",
-    kategori: "pantai",
-  },
-  {
-    nama: "Pantai Anyer",
-    lokasi: "Banten, Indonesia",
-    gambar: "/image/pantai_anyer.jpg",
-    kategori: "pantai",
-  },
-  {
-    nama: "Pantai Sawarna",
-    lokasi: "Banten, Indonesia",
-    gambar: "/image/pantai_sawarna.jpg",
-    kategori: "pantai",
-  },
-  {
-    nama: "Air Terjun Madakaripura",
-    lokasi: "Jawa Timur, Indonesia",
-    gambar: "/image/airterjun_madakaripura.webp",
-    kategori: "air_terjun",
-  },
-  {
-    nama: "Air Terjun Kanto Lampo",
-    lokasi: "Bali, Indonesia",
-    gambar: "/image/airterjun_kantolampo.webp",
-    kategori: "air_terjun",
-  },
-  {
-    nama: "Kawah Putih",
-    lokasi: "Bandung, Indonesia",
-    gambar: "/image/card3.png",
-    kategori: "lainnya",
-  },
-  {
-    nama: "Bukit Tinggi",
-    lokasi: "Sumatera Barat, Indonesia",
-    gambar: "/image/card4.png",
-    kategori: "lainnya",
-  },
-];
-
-const categories = [
-  { label: "Pantai", value: "pantai" },
-  { label: "Air Terjun", value: "air_terjun" },
-  { label: "Lainnya", value: "lainnya" },
-];
+// src/components/layout/RekomendasiSection.jsx
+import React, { useState, useEffect } from "react";
+import RecommendationCard from "../RecommendationCard";
+import { recommendationService } from "../../services/recommendationService";
+import { authService } from "../../services/authService";
+import toast from "react-hot-toast";
 
 const RekomendasiSection = () => {
-  const [kategoriAktif, setKategoriAktif] = useState("pantai");
-  const scrollRef = useRef(null);
-  const [isContentVisible, setIsContentVisible] = useState(true); // State awal true
-  const animationTimeout = useRef(null); // Ref untuk menyimpan timeout
+  const [recommendations, setRecommendations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const dataFiltered = allData.filter((item) => item.kategori === kategoriAktif);
-
-  // Trigger animasi saat kategori berubah
   useEffect(() => {
-    // Bersihkan timeout sebelumnya
-    if (animationTimeout.current) {
-      clearTimeout(animationTimeout.current);
-    }
+    fetchRecommendations();
+  }, []);
 
-    // Sembunyikan konten sementara
-    setIsContentVisible(false);
+  const fetchRecommendations = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-    // Atur ulang animasi setelah delay
-    animationTimeout.current = setTimeout(() => {
-      setIsContentVisible(true);
-    }, 50); // Delay kecil untuk memastikan animasi terpicu
-
-    // Bersihkan saat unmount
-    return () => {
-      if (animationTimeout.current) {
-        clearTimeout(animationTimeout.current);
+      // Pastikan user sudah login
+      if (!authService.isAuthenticated()) {
+        setError("Anda harus login untuk melihat rekomendasi");
+        setIsLoading(false);
+        return;
       }
-    };
-  }, [kategoriAktif]);
 
-  // Fungsi untuk scroll ke kiri (Previous)
-  const scrollLeft = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
+      const response = await recommendationService.getRecommendations();
+      console.log('Recommendation Service Response:', response); // Debug log
+      
+      // Validasi response
+      if (Array.isArray(response)) {
+        console.log('Valid recommendations array received:', response.length, 'items');
+        setRecommendations(response);
+        
+        if (response.length === 0) {
+          setError("Tidak ada rekomendasi yang tersedia. Pastikan Anda sudah mengisi profil dengan interest dan alamat.");
+        }
+      } else {
+        console.warn('Response is not an array:', typeof response, response);
+        setRecommendations([]);
+        setError("Format data rekomendasi tidak valid");
+      }
+      
+    } catch (err) {
+      console.error('Error fetching recommendations:', err);
+      setError(err.message || "Gagal memuat rekomendasi");
+      setRecommendations([]);
+      
+      // Tampilkan toast error
+      toast.error(err.message || "Gagal memuat rekomendasi. Pastikan Anda sudah mengisi profil dengan interest dan alamat.", {
+        duration: 5000,
+        style: {
+          background: "#fee",
+          border: "1px solid #f87171",
+          color: "#dc2626",
+        },
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Fungsi untuk scroll ke kanan (Next)
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
-    }
+  const handleRetry = () => {
+    fetchRecommendations();
   };
+
+  if (isLoading) {
+    return (
+      <div className="w-full flex flex-col items-center gap-6 px-4 md:px-8 lg:px-20 py-10">
+        <div className="w-full max-w-screen-xl">
+          <h2 className="text-[#3A59D1] text-2xl md:text-3xl lg:text-4xl font-semibold font-poppins mb-4">
+            Rekomendasi Wisata
+          </h2>
+          <p className="text-[#0F0F0F] text-lg md:text-xl lg:text-xl font-medium font-poppins mb-8">
+            Pilihan wisata yang cocok untuk Anda
+          </p>
+        </div>
+        
+        {/* Loading State */}
+        <div className="w-full flex justify-center items-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3A59D1] mx-auto mb-4"></div>
+            <p className="text-gray-600 text-lg">Memuat rekomendasi...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full flex flex-col items-center gap-6 px-4 md:px-8 lg:px-20 py-10">
+        <div className="w-full max-w-screen-xl">
+          <h2 className="text-[#3A59D1] text-2xl md:text-3xl lg:text-4xl font-semibold font-poppins mb-4">
+            Rekomendasi Wisata
+          </h2>
+          <p className="text-[#0F0F0F] text-lg md:text-xl lg:text-xl font-medium font-poppins mb-8">
+            Pilihan wisata yang cocok untuk Anda
+          </p>
+        </div>
+        
+        {/* Error State */}
+        <div className="w-full flex justify-center items-center py-12">
+          <div className="text-center max-w-md">
+            <div className="text-red-500 text-6xl mb-4">⚠️</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              Oops! Terjadi Kesalahan
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {error}
+            </p>
+            <button
+              onClick={handleRetry}
+              className="bg-[#3A59D1] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#2d47b8] transition-colors duration-200"
+            >
+              Coba Lagi
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!Array.isArray(recommendations) || recommendations.length === 0) {
+    return (
+      <div className="w-full flex flex-col items-center gap-6 px-4 md:px-8 lg:px-20 py-10">
+        <div className="w-full max-w-screen-xl">
+          <h2 className="text-[#3A59D1] text-2xl md:text-3xl lg:text-4xl font-semibold font-poppins mb-4">
+            Rekomendasi Wisata
+          </h2>
+          <p className="text-[#0F0F0F] text-lg md:text-xl lg:text-xl font-medium font-poppins mb-8">
+            Pilihan wisata yang cocok untuk Anda
+          </p>
+        </div>
+        
+        {/* Empty State */}
+        <div className="w-full flex justify-center items-center py-12">
+          <div className="text-center max-w-md">
+            <div className="text-gray-400 text-6xl mb-4">🏖️</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              Belum Ada Rekomendasi
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Untuk mendapatkan rekomendasi wisata yang personal, lengkapi profil Anda dengan interest dan alamat terlebih dahulu.
+            </p>
+            <button
+              onClick={handleRetry}
+              className="bg-[#3A59D1] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#2d47b8] transition-colors duration-200"
+            >
+              Muat Ulang
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full flex flex-col items-center gap-6 px-4 md:px-8 lg:px-20 py-10">
       {/* Header */}
-      <div className="w-full max-w-screen-xl flex flex-col lg:flex-row justify-between items-start gap-6">
-        <div>
-          <h2 className="text-[#3A59D1] text-2xl md:text-3xl lg:text-4xl font-semibold font-poppins">
-            Rekomendasi Wisata
-          </h2>
-          <p className="text-[#0F0F0F] text-lg md:text-xl lg:text-xl font-medium font-poppins">
-            Pilihan wisata lainnya yang cocok kamu kunjungi
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {categories.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => setKategoriAktif(cat.value)}
-              className={classNames(
-                "text-base md:text-lg font-semibold px-6 md:px-8 py-3 md:py-4 rounded-xl border transition-all duration-200",
-                kategoriAktif === cat.value
-                  ? "bg-[#47BB8E] text-white border-transparent"
-                  : "text-[#A2A2A2] border-[#A2A2A2]"
-              )}
-            >
-              {cat.label}
-            </button>
+      <div className="w-full max-w-screen-xl">
+        <h2 className="text-[#3A59D1] text-2xl md:text-3xl lg:text-4xl font-semibold font-poppins mb-4">
+          Rekomendasi Wisata
+        </h2>
+        <p className="text-[#0F0F0F] text-lg md:text-xl lg:text-xl font-medium font-poppins mb-8">
+          Pilihan wisata yang cocok untuk Anda ({recommendations.length} destinasi)
+        </p>
+      </div>
+
+      {/* Carousel Style */}
+      <div className="w-full overflow-x-auto scrollbar-hide px-1">
+        <div className="flex gap-6 w-max snap-x snap-mandatory scroll-smooth px-1">
+          {recommendations.map((recommendation, index) => (
+            <RecommendationCard 
+              key={recommendation.id || recommendation.nama_wisata || index} 
+              recommendation={recommendation} 
+            />
           ))}
         </div>
       </div>
 
-      {/* Carousel Style Netflix dengan Tombol Next/Previous */}
-      <div className="relative w-full">
-        {/* Tombol Previous dan Next, hanya muncul di desktop (md ke atas) */}
-        <div className="hidden md:flex absolute top-1/2 -translate-y-1/2 left-0 right-0 justify-between px-2">
-          <button
-            onClick={scrollLeft}
-            className="bg-[#3A59D1] text-white p-3 rounded-full shadow-md hover:bg-[#2a449b] transition"
-            aria-label="Previous"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={scrollRight}
-            className="bg-[#3A59D1] text-white p-3 rounded-full shadow-md hover:bg-[#2a449b] transition"
-            aria-label="Next"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
+      {/* Scroll Indicator */}
+      {recommendations.length > 3 && (
+        <div className="flex justify-center mt-4">
+          <p className="text-sm text-gray-500">
+            ← Geser untuk melihat lebih banyak rekomendasi →
+          </p>
         </div>
-
-        {/* Daftar Card dengan Animasi Fade-In */}
-        <div
-          ref={scrollRef}
-          className={classNames(
-            "w-full overflow-x-auto scrollbar-hide px-1",
-            isContentVisible ? "animate-fade-in" : "opacity-0"
-          )}
-        >
-          <div className="flex gap-6 w-max snap-x snap-mandatory scroll-smooth px-1">
-            {dataFiltered.map((item, index) => (
-              <div
-                key={index}
-                className="snap-start w-[250px] sm:w-[280px] md:w-[300px] lg:w-[309px] flex-shrink-0 shadow-md rounded-[30px] bg-white"
-              >
-                <img
-                  src={item.gambar}
-                  alt={item.nama}
-                  className="w-full h-[200px] md:h-[240px] object-cover rounded-t-[30px] border border-gray-300"
-                />
-                <div className="bg-[#F9F9F9] rounded-b-[30px] border border-gray-300 px-5 py-6 flex flex-col justify-between h-[180px]">
-                  <div>
-                    <h2 className="text-lg md:text-xl font-semibold font-poppins text-[#000]">
-                      {item.nama}
-                    </h2>
-                    <p className="text-base text-[#4B4B4B] font-poppins">
-                      {item.lokasi}
-                    </p>
-                  </div>
-                  <button className="bg-[#3A59D1] text-white text-base md:text-lg font-medium py-2 rounded-xl w-full">
-                    Lihat Detail
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

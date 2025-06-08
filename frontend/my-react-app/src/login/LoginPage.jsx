@@ -13,6 +13,7 @@ const LoginPage = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -25,9 +26,11 @@ const LoginPage = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
+    setIsLoading(true);
 
     try {
       const response = await authService.login({
@@ -40,15 +43,13 @@ const LoginPage = () => {
         // Token akan disimpan oleh authService berdasarkan rememberMe
         navigate("/");
       } else {
-        const errorData = await response.json(); // Properly get the error data
-        setErrorMessage(
-          errorData.message ||
-            "Login gagal, periksa kembali email dan password."
-        );
+        setErrorMessage("Login gagal, periksa kembali email dan password.");
       }
     } catch (error) {
-      setErrorMessage("Terjadi kesalahan saat menghubungi server.");
-      console.error("Error details:", error); // Now the error variable is used
+      setErrorMessage(error.message || "Terjadi kesalahan saat login.");
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,7 +58,9 @@ const LoginPage = () => {
       {/* Background Gambar */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/image/background_login.jpg')" }}
+        style={{
+          backgroundImage: "url('../public/image/background-login.jpg')",
+        }}
       />
 
       {/* Form Section */}
@@ -87,6 +90,7 @@ const LoginPage = () => {
               onChange={handleChange}
               className="w-full p-3 border rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-black shadow-sm"
               required
+              disabled={isLoading}
             />
 
             {/* Input Password */}
@@ -99,11 +103,13 @@ const LoginPage = () => {
                 onChange={handleChange}
                 className="w-full p-3 border rounded focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-black shadow-sm"
                 required
+                disabled={isLoading}
               />
               <button
                 type="button"
                 className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 text-xl"
                 onClick={togglePasswordVisibility}
+                disabled={isLoading}
               >
                 {showPassword ? "🙈" : "👁"}
               </button>
@@ -118,12 +124,15 @@ const LoginPage = () => {
                   checked={formData.rememberMe}
                   onChange={handleChange}
                   className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  disabled={isLoading}
                 />
                 <span className="text-sm text-gray-700">Ingat Saya</span>
               </label>
               <span
-                onClick={() => navigate("/forgot-password")}
-                className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
+                onClick={() => !isLoading && navigate("/forgot-password")}
+                className={`text-sm text-blue-600 hover:text-blue-800 cursor-pointer ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 Lupa Kata Sandi?
               </span>
@@ -132,9 +141,10 @@ const LoginPage = () => {
             {/* Tombol Login */}
             <button
               type="submit"
-              className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300"
+              disabled={isLoading}
+              className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Masuk
+              {isLoading ? "Masuk..." : "Masuk"}
             </button>
           </form>
 
@@ -142,8 +152,10 @@ const LoginPage = () => {
           <p className="text-center text-sm text-gray-600 mt-4">
             Belum Punya Akun?{" "}
             <span
-              onClick={() => navigate("/register")}
-              className="text-blue-600 font-semibold cursor-pointer hover:text-blue-800"
+              onClick={() => !isLoading && navigate("/register")}
+              className={`text-blue-600 font-semibold cursor-pointer hover:text-blue-800 ${
+                isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               Daftar Disini
             </span>

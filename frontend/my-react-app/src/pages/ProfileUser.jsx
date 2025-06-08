@@ -6,6 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import ButtonCustom from "../components/Button";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { apiClient, API_CONFIG } from "../services/apiConfig";
+import { authService } from "../services/authService";
 
 const InputField = ({
   id,
@@ -26,7 +28,11 @@ const InputField = ({
         <select
           id={id}
           name={id}
-          className="bg-white text-black shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline disabled:bg-gray-100 disabled:cursor-not-allowed"
+          className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+            disabled 
+              ? "bg-gray-100 cursor-not-allowed" 
+              : "bg-white hover:bg-gray-50 focus:bg-white"
+          }`}
           value={value}
           onChange={onChange}
           disabled={disabled}
@@ -55,6 +61,17 @@ const InputField = ({
         onChange={onChange}
         disabled={disabled}
         aria-describedby={`${id}-helper`}
+        // Tambahan khusus untuk input nomor telepon
+        onKeyPress={id === "phoneNumber" ? (e) => {
+          // Hanya izinkan angka (0-9) dan beberapa karakter khusus seperti +, -, (, ), dan spasi
+          if (!/[0-9+\-() ]/.test(e.key)) {
+            e.preventDefault();
+          }
+        } : undefined}
+        onInput={id === "phoneNumber" ? (e) => {
+          // Hapus semua karakter non-angka kecuali +, -, (, ), dan spasi
+          e.target.value = e.target.value.replace(/[^0-9+\-() ]/g, '');
+        } : undefined}
       />
     </div>
   );
@@ -65,7 +82,7 @@ const ProfileUser = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [userData, setUserData] = useState({
-    nama: "",
+    name: "",
     phoneNumber: "",
     email: "",
     address: "",
@@ -74,69 +91,84 @@ const ProfileUser = () => {
   const [originalData, setOriginalData] = useState(null);
 
   const navigate = useNavigate();
+
   // Mengambil data user ketika komponen dimuat
   useEffect(() => {
     fetchUserData();
   }, []);
 
   const fetchUserData = async () => {
-  try {
-    setIsLoading(true);
+    try {
+      setIsLoading(true);
+      setError(null);
 
-    const token = localStorage.getItem("token");
+      // Cek authentication terlebih dahulu
+      if (!authService.isAuthenticated()) {
+        toast.error("Anda harus login terlebih dahulu", {
+          position: "top-center",
+          autoClose: 3000,
+        });
+        navigate("/login");
+        return;
+      }
 
-    if (!token) {
-      throw new Error("Token tidak ditemukan. Silakan login kembali.");
+      const response = await apiClient.get(API_CONFIG.ENDPOINTS.PROFILE);
+      
+      if (response.success && response.data) {
+        // Sesuaikan mapping data dari backend ke frontend
+        const profileData = {
+          name: response.data.name || "",
+          phoneNumber: response.data.phoneNumber || "",
+          email: response.data.email || "",
+          address: response.data.address || "",
+          interest: response.data.interest || "",
+        };
+        
+        setUserData(profileData);
+        setOriginalData(profileData);
+      } else {
+        throw new Error(response.message || "Gagal mengambil data profil");
+      }
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+      
+      // Handle specific error cases
+      if (err.message.includes("401") || err.message.includes("Unauthorized")) {
+        setError("Sesi Anda telah berakhir. Silakan login kembali.");
+        authService.clearToken();
+        navigate("/login");
+      } else if (err.message.includes("403") || err.message.includes("Forbidden")) {
+        setError("Anda tidak memiliki akses untuk melihat data ini.");
+      } else if (err.message.includes("404")) {
+        setError("Data profil tidak ditemukan.");
+      } else if (err.message.includes("500")) {
+        setError("Terjadi kesalahan pada server. Silakan coba lagi nanti.");
+      } else {
+        setError(err.message || "Terjadi kesalahan saat mengambil data profil");
+      }
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    const response = await fetch("http://localhost:5000/api/user/profile", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    // Tangani token yang sudah tidak berlaku
-    if (response.status === 401 || response.status === 403) {
-      toast.error("Sesi login telah berakhir. Silakan login kembali.", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-
-      localStorage.removeItem("token"); // Hapus token dari storage
-      window.location.href = "/login"; // Redirect ke halaman login
-      return;
-    }
-
-    if (!response.ok) {
-      throw new Error("Gagal mengambil data profil");
-    }
-
-    const data = await response.json();
-    setUserData(data);
-    setOriginalData(data);
-  } catch (err) {
-    toast.error(err.message || "Terjadi kesalahan saat mengambil data.", {
-      position: "top-center",
-      autoClose: 3000,
-    });
-    setError(err.message);
-  } finally {
-    setIsLoading(false);
-  }
-};
   const handleInputChange = (e) => {
     const { id, value, name } = e.target;
     const fieldName = id || name; // fallback ke name jika id tidak ada
-    setUserData((prev) => ({
-      ...prev,
-      [fieldName]: value,
-    }));
+    
+    // Validasi khusus untuk phoneNumber
+    if (fieldName === "phoneNumber") {
+      // Hanya izinkan angka, +, -, (, ), dan spasi
+      const sanitizedValue = value.replace(/[^0-9+\-() ]/g, '');
+      setUserData((prev) => ({
+        ...prev,
+        [fieldName]: sanitizedValue,
+      }));
+    } else {
+      setUserData((prev) => ({
+        ...prev,
+        [fieldName]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -147,9 +179,18 @@ const ProfileUser = () => {
       return;
     }
 
+    // Validasi nomor telepon sebelum submit
+    if (userData.phoneNumber && !/^[0-9+\-() ]+$/.test(userData.phoneNumber)) {
+      toast.error("Nomor telepon hanya boleh berisi angka dan karakter +, -, (, ), spasi", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
+
     // Memeriksa apakah ada perubahan data
     const hasChanges =
-      userData.nama !== originalData?.nama ||
+      userData.name !== originalData?.name ||
       userData.phoneNumber !== originalData?.phoneNumber ||
       userData.address !== originalData?.address ||
       userData.interest !== originalData?.interest;
@@ -157,53 +198,93 @@ const ProfileUser = () => {
     // Jika tidak ada perubahan, kembalikan ke mode view saja
     if (!hasChanges) {
       setIsEditing(false);
+      toast.info("Tidak ada perubahan yang perlu disimpan", {
+        position: "top-center",
+        autoClose: 2000,
+      });
       return;
     }
 
     try {
       setIsLoading(true);
-      const token = localStorage.getItem("token");
+      setError(null);
 
-      if (!token) {
-        setError("Token tidak ditemukan. Silakan login kembali.");
+      // Cek authentication
+      if (!authService.isAuthenticated()) {
+        toast.error("Anda harus login terlebih dahulu", {
+          position: "top-center",
+          autoClose: 3000,
+        });
         navigate("/login");
         return;
       }
 
-      const response = await fetch("http://localhost:5000/api/user/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          nama: userData.nama,
-          phoneNumber: userData.phoneNumber,
-          address: userData.address,
-          interest: userData.interest,
-        }),
+      // Siapkan data untuk update (sesuai dengan API backend)
+      const updateData = {
+        interest: userData.interest,
+        address: userData.address,
+        phoneNumber: userData.phoneNumber,
+      };
+
+      // Hapus field yang kosong untuk menghindari error
+      Object.keys(updateData).forEach(key => {
+        if (updateData[key] === "") {
+          delete updateData[key];
+        }
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Gagal memperbarui profil");
+      const response = await apiClient.put(API_CONFIG.ENDPOINTS.PROFILE, updateData);
+
+      if (response.success) {
+        // Update data lokal dengan response dari server
+        const updatedProfileData = {
+          ...userData,
+          ...response.data,
+        };
+        
+        setUserData(updatedProfileData);
+        setOriginalData(updatedProfileData);
+        setIsEditing(false);
+        
+        toast.success("Profil berhasil diperbarui!", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      } else {
+        throw new Error(response.message || "Gagal memperbarui profil");
       }
-      const updatedData = await response.json();
-      setUserData(updatedData);
-      setIsEditing(false);
-      toast.success("Profil berhasil diperbarui!", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
     } catch (err) {
-      setError(err.message);
-      toast.error("Gagal memperbarui profil: " + err.message, {
+      console.error("Error updating profile:", err);
+      
+      let errorMessage = "Gagal memperbarui profil";
+      
+      // Handle specific error cases
+      if (err.message.includes("401") || err.message.includes("Unauthorized")) {
+        errorMessage = "Sesi Anda telah berakhir. Silakan login kembali.";
+        authService.clearToken();
+        navigate("/login");
+      } else if (err.message.includes("400") || err.message.includes("Bad Request")) {
+        errorMessage = "Data yang Anda masukkan tidak valid. Periksa kembali form Anda.";
+      } else if (err.message.includes("403") || err.message.includes("Forbidden")) {
+        errorMessage = "Anda tidak memiliki akses untuk mengubah data ini.";
+      } else if (err.message.includes("500")) {
+        errorMessage = "Terjadi kesalahan pada server. Silakan coba lagi nanti.";
+      } else if (err.message.includes("must be a valid email")) {
+        errorMessage = "Format email tidak valid.";
+      } else if (err.message.includes("required")) {
+        errorMessage = "Semua field wajib harus diisi.";
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      setError(errorMessage);
+      toast.error(errorMessage, {
         position: "top-center",
-        autoClose: 3000,
+        autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -213,6 +294,26 @@ const ProfileUser = () => {
       setIsLoading(false);
     }
   };
+
+  // Show loading state
+  if (isLoading && !userData.email) {
+    return (
+      <div className="w-full mx-auto min-h-screen flex flex-col bg-white">
+        <header className="sticky top-0 z-50">
+          <Navbar />
+        </header>
+        <main className="w-full flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Memuat data profil...</p>
+          </div>
+        </main>
+        <footer className="mt-auto">
+          <Footer />
+        </footer>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full mx-auto min-h-screen flex flex-col bg-white">
@@ -231,10 +332,16 @@ const ProfileUser = () => {
         </section>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-            {error}
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 mx-6">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <span>{error}</span>
+            </div>
           </div>
         )}
+        
         <div className="flex flex-row gap-6 border xs:flex-col px-6 w-full">
           <aside className="w-3/4 xs:w-full">
             <div className="bg-secondary/30 p-6 rounded-lg shadow-md h-fit">
@@ -253,11 +360,19 @@ const ProfileUser = () => {
           <section className="border border-gray-400 w-full p-6 bg-white rounded-lg shadow-md">
             <form onSubmit={handleSubmit} className="w-full mr-60">
               <InputField
-                id="nama"
+                id="name"
                 label="Nama Lengkap"
-                value={userData.nama}
+                value={userData.name}
                 onChange={handleInputChange}
-                disabled={!isEditing}
+                disabled={true} // Name tidak bisa diubah berdasarkan API
+              />
+              <InputField
+                id="email"
+                label="Email"
+                value={userData.email}
+                onChange={handleInputChange}
+                disabled={true} // Email tidak bisa diubah berdasarkan API
+                type="email"
               />
               <InputField
                 id="phoneNumber"
@@ -265,15 +380,7 @@ const ProfileUser = () => {
                 value={userData.phoneNumber}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                type="tel"
-              />
-              <InputField
-                id="email"
-                label="Email"
-                value={userData.email}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                type="email"
+                type="text"
               />
               <InputField
                 id="address"
@@ -337,9 +444,9 @@ const ProfileUser = () => {
                 options={[
                   { value: "", label: "Pilih Minat" },
                   { value: "Air Terjun", label: "Air Terjun" },
-                  { value: "Alun-Alun", label: "Bandung" },
-                  { value: "Bukit", label: "Surabaya" },
-                  { value: "Cafe View", label: "Medan" },
+                  { value: "Alun-Alun", label: "Alun-Alun" },
+                  { value: "Bukit", label: "Bukit" },
+                  { value: "Cafe View", label: "Cafe View" },
                   { value: "Candi", label: "Candi" },
                   { value: "Gunung", label: "Gunung" },
                   { value: "Kebun Binatang", label: "Kebun Binatang" },
@@ -370,7 +477,9 @@ const ProfileUser = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       setIsEditing(true);
+                      setError(null); // Clear any existing errors
                     }}
+                    disabled={isLoading}
                   >
                     Edit Profil
                   </ButtonCustom>
@@ -389,14 +498,16 @@ const ProfileUser = () => {
                       {isLoading ? "Menyimpan..." : "Simpan"}
                     </ButtonCustom>
                     <ButtonCustom
-                      type="cancel"
+                      type="button"
                       onClick={(e) => {
                         e.preventDefault();
                         setIsEditing(false);
+                        setError(null); // Clear any existing errors
                         // Reset form ke data awal
-                        fetchUserData();
+                        setUserData({ ...originalData });
                       }}
                       className="bg-red-500 hover:bg-red-600"
+                      disabled={isLoading}
                     >
                       Batal
                     </ButtonCustom>
