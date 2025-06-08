@@ -7,6 +7,7 @@ import Destinasi from "./pages/destinasi/DetailPage";
 import DestinationPlan from "./pages/DestinationPlan";
 import About from "./pages/About";
 import ProfileUser from "./pages/ProfileUser";
+import Search from "./pages/Search";
 import TravelPlan from "./pages/plan/TravelPlan";
 import ForgotPassword from "./utils/LupaSandi";
 import ResetPassword from "./utils/resetPasword";
@@ -23,15 +24,17 @@ const App = () => {
         <Route path="/destinasi/:placeName" element={<Destinasi />} />
         <Route path="/destination" element={<DestinationPlan />} />
         <Route path="/about" element={<About />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/profile" element={<ProfileUser />} />
         <Route path="/plan" element={<TravelPlan />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route
           path="*"
-          element={
+          element={ 
             <h1 className="text-center text-red-600 text-3xl mt-10">
-              404: Not Found
+              404: Not Found <br />
+              Halaman tidak ditemukan
             </h1>
           }
         />

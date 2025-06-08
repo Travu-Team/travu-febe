@@ -3,12 +3,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { authService } from "../services/authService";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate(); // Hook untuk navigasi
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const token = authService.getToken();
@@ -38,6 +41,14 @@ const Navbar = () => {
     const names = name.trim().split(" ");
     if (names.length === 1) return names[0][0].toUpperCase();
     return (names[0][0] + names[1][0]).toUpperCase();
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === "Enter" && searchQuery.trim() !== "") {
+      navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false); // tutup search bar
+      setSearchQuery(""); // reset input
+    }
   };
 
   return (
@@ -133,7 +144,7 @@ const Navbar = () => {
           <button
             onClick={() => setIsSearchOpen(!isSearchOpen)}
             aria-label="Toggle search"
-            className="w-10 h-10 bg-[#3a59d1] text-white rounded-full flex items-center justify-center"
+            className="w-10 h-10 bg-[#3a59d1] text-white rounded-full flex items-center justify-center "
           >
             <FontAwesomeIcon icon={faSearch} />
           </button>
@@ -208,9 +219,12 @@ const Navbar = () => {
 
       {/* Search Bar */}
       {isSearchOpen && (
-        <div className="absolute top-[60px] left-1/2 transform -translate-x-1/2 w-full max-w-md px-4 z-40">
+        <div className="absolute top-[60px] left-1/2 transform -translate-x-1/2 w-full max-w-md px-4 z-40 mt-3yy">
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
             placeholder="Cari sesuatu..."
             className="w-full p-2 pl-10 bg-gray-200 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Search"
