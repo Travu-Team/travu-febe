@@ -9,7 +9,7 @@ NOTE: HARAP DIPERHATIKAN UNTUK SELALU PULL REPOSITORY TERLEBIH DAHULU SEBELUM ME
 - [x] Homepage (Tyo)
 - [x] Travel Details/Detail Wisata (Yunas)
 - [x] Profile Users (Luthfi)
-- [ ] Search Page (Tyo)
+- [x] Search Page (Tyo)
 - [x] Destination Plan / Rencana Wisata (Yunas)
 - [x] Login & Register (Yunas)
 - [x] About (Luthfi)
