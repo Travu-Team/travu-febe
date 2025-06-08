@@ -2,17 +2,16 @@ import { useEffect, useState, useCallback } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faTrash, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 import TravelPlanForm from "./TravelPlanForm";
 
 const TravelPlan = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [localPlans, setLocalPlans] = useState([]);
   const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState("");
+
 
   const ambilDataDariIndexedDB = useCallback(() => {
-    const request = indexedDB.open('travelPlanDB', 2); // Ubah ke versi 2
+  const request = indexedDB.open('travelPlanDB', 2);
 
     request.onerror = (event) => {
       console.error('Error membuka IndexedDB:', event.target.error);
@@ -69,7 +68,7 @@ const TravelPlan = () => {
     ambilDataDariIndexedDB(); // Refresh data setelah modal ditutup
   };
 
-  // Tambahkan effect untuk memanggil fungsi ambil data setiap kali modal ditutup
+  // Menambahkan effect untuk memanggil fungsi ambil data setiap kali modal ditutup
   useEffect(() => {
     if (!isModalVisible) {
       ambilDataDariIndexedDB();
@@ -100,7 +99,7 @@ const TravelPlan = () => {
             onClose={handleCloseModal}
           />
 
-          {/* Tampilkan data dari IndexedDB */}
+          {/* Menampilkan data dari IndexedDB */}
           {loading ? (
             <div className="text-center mt-10">Loading...</div>
           ) : (
@@ -121,7 +120,7 @@ const TravelPlan = () => {
                       ))}
                     </div>
 
-                    {/* Informasi rencana */}
+                    {/* Informasi Rencana Wisata */}
                     <div className="p-4">
                       <h3 className="font-bold text-lg">{plan.planName}</h3>
                       <p className="text-gray-600">

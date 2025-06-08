@@ -250,7 +250,7 @@ const TravelPlanForm = ({ visible, onClose}) => {
                 ))}
               </div>
 
-              {/Button Konfirmasi Menyimpan Rencana Perjalanan/}
+              {/*Button Konfirmasi Menyimpan Rencana Perjalanan*/}
               <div className="mt-4 flex justify-end">
                 <button
                   onClick={handleSubmitPlan}
