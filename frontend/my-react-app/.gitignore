@@ -1,5 +1,5 @@
 # Menambahkan folder service agar tidak terdeploy
-service/
+src/service/
 # Logs
 logs
 *.log
