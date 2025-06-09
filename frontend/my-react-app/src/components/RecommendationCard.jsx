@@ -98,23 +98,6 @@ const RecommendationCard = ({ recommendation }) => {
     return 'Alamat tidak tersedia';
   };
 
-  // Ambil deskripsi jika ada
-  const getDescription = () => {
-    if (recommendation.deskripsi_bersih && recommendation.deskripsi_bersih !== 'Deskripsi tidak ditemukan') {
-      return recommendation.deskripsi_bersih;
-    }
-    if (recommendation.description) {
-      return recommendation.description;
-    }
-    if (recommendation.deskripsi) {
-      return recommendation.deskripsi;
-    }
-    return '';
-  };
-
-  // Debug log untuk melihat struktur data
-  console.log('Recommendation data:', recommendation);
-
   const imageUrl = getImageUrl();
 
   return (
@@ -127,7 +110,6 @@ const RecommendationCard = ({ recommendation }) => {
             alt={getDestinationName()}
             className="w-full h-[220px] object-cover transition-transform duration-300 hover:scale-105"
             onError={(e) => {
-              console.log('Image failed to load:', e.target.src);
               // Hide the broken image and show placeholder div
               e.target.style.display = 'none';
               e.target.nextElementSibling.style.display = 'flex';
@@ -166,19 +148,12 @@ const RecommendationCard = ({ recommendation }) => {
         </h3>
 
         {/* Alamat */}
-        <div className="flex items-start gap-2 mb-3">
+        <div className="flex items-start gap-2 mb-4">
           <span className="text-[#3A59D1] text-sm mt-0.5 flex-shrink-0">📍</span>
           <p className="text-sm text-gray-600 font-poppins line-clamp-2 leading-relaxed">
             {getDestinationAddress()}
           </p>
         </div>
-
-        {/* Deskripsi singkat jika ada */}
-        {getDescription() && (
-          <p className="text-xs text-gray-500 font-poppins line-clamp-2 mb-4 leading-relaxed min-h-[2rem]">
-            {getDescription()}
-          </p>
-        )}
 
         {/* Button Selengkapnya */}
         <button 

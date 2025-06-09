@@ -59,7 +59,7 @@ const LoginPage = () => {
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: "url('../public/image/background-login.jpg')",
+          backgroundImage: "url('/image/background_login.jpg')",
         }}
       />
 
@@ -128,14 +128,14 @@ const LoginPage = () => {
                 />
                 <span className="text-sm text-gray-700">Ingat Saya</span>
               </label>
-              <span
+              {/* <span
                 onClick={() => !isLoading && navigate("/forgot-password")}
                 className={`text-sm text-blue-600 hover:text-blue-800 cursor-pointer ${
                   isLoading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
                 Lupa Kata Sandi?
-              </span>
+              </span> */}
             </div>
 
             {/* Tombol Login */}

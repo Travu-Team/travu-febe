@@ -70,8 +70,16 @@ const InputField = ({
         } : undefined}
         onInput={id === "phoneNumber" ? (e) => {
           // Hapus semua karakter non-angka kecuali +, -, (, ), dan spasi
-          e.target.value = e.target.value.replace(/[^0-9+\-() ]/g, '');
+          let cleanValue = e.target.value.replace(/[^0-9+\-() ]/g, '');
+          
+          // Batasi panjang nomor telepon maksimal 15 karakter
+          if (cleanValue.length > 15) {
+            cleanValue = cleanValue.substring(0, 15);
+          }
+          
+          e.target.value = cleanValue;
         } : undefined}
+        maxLength={id === "phoneNumber" ? 15 : undefined}
       />
     </div>
   );
@@ -158,7 +166,13 @@ const ProfileUser = () => {
     // Validasi khusus untuk phoneNumber
     if (fieldName === "phoneNumber") {
       // Hanya izinkan angka, +, -, (, ), dan spasi
-      const sanitizedValue = value.replace(/[^0-9+\-() ]/g, '');
+      let sanitizedValue = value.replace(/[^0-9+\-() ]/g, '');
+      
+      // Batasi panjang maksimal 15 karakter
+      if (sanitizedValue.length > 15) {
+        sanitizedValue = sanitizedValue.substring(0, 15);
+      }
+      
       setUserData((prev) => ({
         ...prev,
         [fieldName]: sanitizedValue,
@@ -180,12 +194,33 @@ const ProfileUser = () => {
     }
 
     // Validasi nomor telepon sebelum submit
-    if (userData.phoneNumber && !/^[0-9+\-() ]+$/.test(userData.phoneNumber)) {
-      toast.error("Nomor telepon hanya boleh berisi angka dan karakter +, -, (, ), spasi", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-      return;
+    if (userData.phoneNumber) {
+      // Cek format nomor telepon
+      if (!/^[0-9+\-() ]+$/.test(userData.phoneNumber)) {
+        toast.error("Nomor telepon hanya boleh berisi angka dan karakter +, -, (, ), spasi", {
+          position: "top-center",
+          autoClose: 3000,
+        });
+        return;
+      }
+      
+      // Cek panjang nomor telepon (minimal 10, maksimal 15 karakter)
+      const phoneDigits = userData.phoneNumber.replace(/[^0-9]/g, '');
+      if (phoneDigits.length < 10) {
+        toast.error("Nomor telepon minimal harus 10 digit", {
+          position: "top-center",
+          autoClose: 3000,
+        });
+        return;
+      }
+      
+      if (phoneDigits.length > 15) {
+        toast.error("Nomor telepon maksimal 15 digit", {
+          position: "top-center",
+          autoClose: 3000,
+        });
+        return;
+      }
     }
 
     // Memeriksa apakah ada perubahan data
@@ -321,10 +356,10 @@ const ProfileUser = () => {
       <header className="sticky top-0 z-50">
         <Navbar />
       </header>
-      <main className="w-full flex-grow">
-        <section className="mb-8 text-center">
-          <h1 className="text-3xl font-md text-black">Selamat Datang</h1>
-          <p className="text-xl font-md text-gray-600 mt-2">
+      <main className="w-full flex-grow px-4 sm:px-6">
+        <section className="mb-8 text-center py-6">
+          <h1 className="text-2xl sm:text-3xl font-medium text-black">Selamat Datang</h1>
+          <p className="text-lg sm:text-xl font-medium text-gray-600 mt-2">
             {isEditing
               ? "Silakan Edit Profil Anda"
               : "Di Halaman Informasi Profil"}
@@ -332,33 +367,33 @@ const ProfileUser = () => {
         </section>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 mx-6">
-            <div className="flex items-center">
-              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 max-w-full">
+            <div className="flex items-start">
+              <svg className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
-              <span>{error}</span>
+              <span className="break-words">{error}</span>
             </div>
           </div>
         )}
         
-        <div className="flex flex-row gap-6 border xs:flex-col px-6 w-full">
-          <aside className="w-3/4 xs:w-full">
-            <div className="bg-secondary/30 p-6 rounded-lg shadow-md h-fit">
-              <h2 className="text-xl font-semibold mb-6 text-gray-800">
+        <div className="flex flex-col lg:flex-row gap-6 w-full max-w-7xl mx-auto">
+          <aside className="w-full lg:w-1/4">
+            <div className="bg-secondary/30 p-4 sm:p-6 rounded-lg shadow-md">
+              <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-gray-800">
                 Navigasi Profil
               </h2>
               <ul className="space-y-4 cursor-pointer">
-                <li className="flex items-center gap-3">
-                  <UserCircleIcon className="h-5 w-5" />
-                  Profil Saya
+                <li className="flex items-center gap-3 text-sm sm:text-base">
+                  <UserCircleIcon className="h-5 w-5 flex-shrink-0" />
+                  <span>Profil Saya</span>
                 </li>
               </ul>
             </div>
           </aside>
 
-          <section className="border border-gray-400 w-full p-6 bg-white rounded-lg shadow-md">
-            <form onSubmit={handleSubmit} className="w-full mr-60">
+          <section className="w-full lg:w-3/4 border border-gray-400 p-4 sm:p-6 bg-white rounded-lg shadow-md">
+            <form onSubmit={handleSubmit} className="w-full">
               <InputField
                 id="name"
                 label="Nama Lengkap"
@@ -402,7 +437,7 @@ const ProfileUser = () => {
                   { value: "Jawa Barat", label: "Jawa Barat" },
                   { value: "Banten", label: "Banten" },
                   { value: "Jawa Tengah", label: "Jawa Tengah" },
-                  { value: "Yogyakarta", label: "Yogyakarta" },
+                  { value: "Daerah Istimewa Yogyakarta", label: "Yogyakarta" },
                   { value: "Jawa Timur", label: "Jawa Timur" },
                   { value: "Bali", label: "Bali" },
                   {
@@ -470,7 +505,7 @@ const ProfileUser = () => {
                 onChange={handleInputChange}
                 disabled={!isEditing}
               />
-              <div className="flex gap-4 mt-6 justify-start w-full">
+              <div className="flex flex-col sm:flex-row gap-4 mt-6 justify-start w-full">
                 {!isEditing ? (
                   <ButtonCustom
                     type="button"
