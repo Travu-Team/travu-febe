@@ -8,9 +8,9 @@ const dataGambar = {
   Pantai: [
     "/image/pantai_sanur.jpg",
     "/image/pantai_anyer.jpg",
-    "/image/pantai_sanur.jpg",
-    "/image/pantai_anyer.jpg",
-    "/image/pantai_anyer.jpg",
+    "/image/pantai_sawarna.jpg",
+    "/image/pantai_balekambang.jpg",
+    "/image/pantai_amed.webp",
   ],
   "Air Terjun": [
     "/image/airterjun_madakaripura.webp",
