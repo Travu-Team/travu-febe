@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal } from 'antd';
 import Papa from 'papaparse';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faExclamationTriangle, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -339,13 +339,19 @@ const TravelPlanForm = ({ visible, onClose, editingPlan }) => {
             <label className="block mb-2 font-medium">
               Rencana Pergi <span className="text-red-500">*</span>
             </label>
-            <input
-              type="date"
-              className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
-              value={travelPlan.date}
-              onChange={handleDateChange}
-              min={new Date().toISOString().split('T')[0]} // Minimal hari ini
-            />
+            <div className="relative">
+              <input
+                type="date"
+                className="w-full border rounded-md p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+                value={travelPlan.date}
+                onChange={handleDateChange}
+                min={new Date().toISOString().split('T')[0]}
+              />
+              <FontAwesomeIcon 
+                icon={faCalendarAlt} 
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700"
+              />
+            </div>
           </div>
         
         {/* Kolom Kanan */}
