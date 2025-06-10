@@ -12,7 +12,7 @@ const Navbar = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  const location = useLocation(); // Untuk highlight active link
+  const _location = useLocation(); // Untuk highlight active link
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
 

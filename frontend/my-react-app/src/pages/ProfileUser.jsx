@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
@@ -105,59 +105,63 @@ const ProfileUser = () => {
     fetchUserData();
   }, []);
 
-  const fetchUserData = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  // Wrap fetchUserData dengan useCallback
+const fetchUserData = useCallback(async () => {
+  try {
+    setIsLoading(true);
+    setError(null);
 
-      // Cek authentication terlebih dahulu
-      if (!authService.isAuthenticated()) {
-        toast.error("Anda harus login terlebih dahulu", {
-          position: "top-center",
-          autoClose: 3000,
-        });
-        navigate("/login");
-        return;
-      }
-
-      const response = await apiClient.get(API_CONFIG.ENDPOINTS.PROFILE);
-      
-      if (response.success && response.data) {
-        // Sesuaikan mapping data dari backend ke frontend
-        const profileData = {
-          name: response.data.name || "",
-          phoneNumber: response.data.phoneNumber || "",
-          email: response.data.email || "",
-          address: response.data.address || "",
-          interest: response.data.interest || "",
-        };
-        
-        setUserData(profileData);
-        setOriginalData(profileData);
-      } else {
-        throw new Error(response.message || "Gagal mengambil data profil");
-      }
-    } catch (err) {
-      console.error("Error fetching user data:", err);
-      
-      // Handle specific error cases
-      if (err.message.includes("401") || err.message.includes("Unauthorized")) {
-        setError("Sesi Anda telah berakhir. Silakan login kembali.");
-        authService.clearToken();
-        navigate("/login");
-      } else if (err.message.includes("403") || err.message.includes("Forbidden")) {
-        setError("Anda tidak memiliki akses untuk melihat data ini.");
-      } else if (err.message.includes("404")) {
-        setError("Data profil tidak ditemukan.");
-      } else if (err.message.includes("500")) {
-        setError("Terjadi kesalahan pada server. Silakan coba lagi nanti.");
-      } else {
-        setError(err.message || "Terjadi kesalahan saat mengambil data profil");
-      }
-    } finally {
-      setIsLoading(false);
+    if (!authService.isAuthenticated()) {
+      toast.error("Anda harus login terlebih dahulu", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      navigate("/login");
+      return;
     }
-  };
+
+    const response = await apiClient.get(API_CONFIG.ENDPOINTS.PROFILE);
+    
+    if (response.success && response.data) {
+      const profileData = {
+        name: response.data.name || "",
+        phoneNumber: response.data.phoneNumber || "",
+        email: response.data.email || "",
+        address: response.data.address || "",
+        interest: response.data.interest || "",
+      };
+      
+      setUserData(profileData);
+      setOriginalData(profileData);
+    } else {
+      throw new Error(response.message || "Gagal mengambil data profil");
+    }
+  } catch (err) {
+    console.error("Error fetching user data:", err);
+    
+    if (err.message.includes("401") || err.message.includes("Unauthorized")) {
+      setError("Sesi Anda telah berakhir. Silakan login kembali.");
+      authService.clearToken();
+      navigate("/login");
+    } else if (err.message.includes("403") || err.message.includes("Forbidden")) {
+      setError("Anda tidak memiliki akses untuk melihat data ini.");
+    } else if (err.message.includes("404")) {
+      setError("Data profil tidak ditemukan.");
+    } else if (err.message.includes("500")) {
+      setError("Terjadi kesalahan pada server. Silakan coba lagi nanti.");
+    } else {
+      setError(err.message || "Terjadi kesalahan saat mengambil data profil");
+    }
+  } finally {
+    setIsLoading(false);
+  }
+}, [navigate]); // Tambahkan navigate sebagai dependency
+
+// useEffect sudah benar dengan dependency
+useEffect(() => {
+  fetchUserData();
+}, [fetchUserData]);
+
 
   const handleInputChange = (e) => {
     const { id, value, name } = e.target;
