@@ -10,17 +10,18 @@ NOTE: HARAP DIPERHATIKAN UNTUK SELALU PULL REPOSITORY TERLEBIH DAHULU SEBELUM ME
 - [x] Travel Details/Detail Wisata (Yunas)
 - [x] Profile Users (Luthfi)
 - [x] Search Page (Tyo)
-- [x] Destination Plan / Rencana Wisata (Yunas)
+- [x] Travel Plan (Yunas)
 - [x] Login & Register (Yunas)
 - [x] About (Luthfi)
 - [x] Components: Navbar & Footer (Tyo), Button & Cards (Luthfi)
 
 ## BACK-END
 
-- [x] Autentikasi Login & Register (Yunas & Luthfi)
+- [x] Autentikasi login & register (Yunas & Luthfi)
 - [x] CRUD laman profile user (Luthfi)
-- [ ] CRUD laman travel details (Yunas)
-- [ ] CRUD laman destination plan
+- [x] CRUD laman travel details (Yunas)
+- [x] CRUD laman travel plan (Luthfi)
+- [x] Integrasi Backend to ML (Yunas)
 
 ## HOW TO CLONE REPOSITORY
 
@@ -54,4 +55,3 @@ Tentu! Berikut versi README yang lebih lengkap dan terstruktur sesuai permintaan
 - Cara revert/rollback/reset, terutama saat sudah di main branch
 
 ---
-
