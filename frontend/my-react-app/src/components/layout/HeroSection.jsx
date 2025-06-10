@@ -31,7 +31,7 @@ const HeroSection = () => {
         ></div>
       </div>
 
-      <div className="w-full flex justify-center bg-cover bg-top bg-no-repeat text-[#3a59d1] font-poppins relative overflow-hidden py-12 lg:py-24">
+      <div className="w-full flex justify-center bg-cover bg-top bg-no-repeat text-[#3a59d1] font-poppins relative overflow-hidden">
         {/* Background and overlay elements remain the same */}
 
         <div className="w-full max-w-[1112px] px-4 lg:px-0 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-0 relative z-10">
