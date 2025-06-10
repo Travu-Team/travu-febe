@@ -39,7 +39,8 @@ const About = () => {
               <div className="md:hidden absolute z-20 inset-0 bg-black/60 flex items-end justify-center text-white">
                 <div className="px-6 py-6 text-center">
                   <h2 className="text-xl font-bold mb-2">
-                    Liburan Sesuai Mood? Bisa Banget!
+                    Liburan Sesuai Mood?
+                    <br /> Bisa Banget!
                   </h2>
                   <p className="text-sm font-medium leading-relaxed">
                     Lagi pengen adventure? Atau healing <br />

@@ -6,7 +6,6 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-
 const DestinasiDetail = () => {
   const { placeName } = useParams();
   const [detail, setDetail] = useState(null);
@@ -17,31 +16,37 @@ const DestinasiDetail = () => {
     const fetchDetail = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/src/data/wisata_indonesia_final_fix.csv");
+        const response = await fetch(
+          "/src/data/wisata_indonesia_final_fix.csv"
+        );
         const data = await response.text();
         const result = Papa.parse(data, { header: true, skipEmptyLines: true });
 
         // Decode placeName dari URL dan cari data yang cocok
-        const decodedPlaceName = decodeURIComponent(placeName).trim().toLowerCase();
-        
-        const found = result.data.find(item => {
+        const decodedPlaceName = decodeURIComponent(placeName)
+          .trim()
+          .toLowerCase();
+
+        const found = result.data.find((item) => {
           // Cek berbagai kemungkinan field nama dari CSV
-          const namaWisata = (item.nama_wisata || '').trim().toLowerCase();
-          const nama = (item.nama || '').trim().toLowerCase();
-          const name = (item.name || '').trim().toLowerCase();
-          
-          return decodedPlaceName === namaWisata || 
-                 decodedPlaceName === nama || 
-                 decodedPlaceName === name;
+          const namaWisata = (item.nama_wisata || "").trim().toLowerCase();
+          const nama = (item.nama || "").trim().toLowerCase();
+          const name = (item.name || "").trim().toLowerCase();
+
+          return (
+            decodedPlaceName === namaWisata ||
+            decodedPlaceName === nama ||
+            decodedPlaceName === name
+          );
         });
 
         if (found) {
           setDetail(found);
         } else {
-          console.warn('Detail not found for:', decodedPlaceName);
+          console.warn("Detail not found for:", decodedPlaceName);
         }
       } catch (error) {
-        console.error('Error fetching detail:', error);
+        console.error("Error fetching detail:", error);
       } finally {
         setIsLoading(false);
       }
@@ -73,8 +78,12 @@ const DestinasiDetail = () => {
         <Navbar />
         <div className="flex justify-center items-center min-h-screen bg-gray-100">
           <div className="text-center">
-            <h2 className="text-red-600 text-2xl font-bold">Data tidak ditemukan!</h2>
-            <p className="text-gray-600">Pastikan URL sudah benar atau coba kembali nanti.</p>
+            <h2 className="text-red-600 text-2xl font-bold">
+              Data tidak ditemukan!
+            </h2>
+            <p className="text-gray-600">
+              Pastikan URL sudah benar atau coba kembali nanti.
+            </p>
             <p className="text-sm text-gray-500 mt-2">
               Mencari: {decodeURIComponent(placeName)}
             </p>
@@ -88,30 +97,34 @@ const DestinasiDetail = () => {
   // Handle image path - bisa dari berbagai sumber
   const getImageSrc = () => {
     const imagePath = detail.Image_Path || detail.image_path || detail.gambar;
-    
+
     if (!imagePath) {
       return null;
     }
-    
+
     if (imagePath.startsWith("http")) {
       return imagePath;
     }
-    
+
     return `/public/images/${imagePath}`;
   };
 
   const imageSrc = getImageSrc();
-  
+
   // Handle koordinat untuk Google Maps
   const latitude = detail.latitude || detail.lat;
   const longitude = detail.longitude || detail.lng || detail.lon;
-  const googleMapsUrl = latitude && longitude 
-    ? `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
-    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(detail.nama_wisata || detail.nama)}`;
+  const googleMapsUrl =
+    latitude && longitude
+      ? `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+          detail.nama_wisata || detail.nama
+        )}`;
 
   // Handle nama destinasi
-  const destinationName = detail.nama_wisata || detail.nama || detail.name || 'Destinasi';
-  
+  const destinationName =
+    detail.nama_wisata || detail.nama || detail.name || "Destinasi";
+
   return (
     <>
       <Navbar />
@@ -121,12 +134,12 @@ const DestinasiDetail = () => {
           {/* Image Container */}
           <div className="w-full">
             {imageSrc && !imageError ? (
-              <img 
-                src={imageSrc} 
-                alt={destinationName} 
+              <img
+                src={imageSrc}
+                alt={destinationName}
                 className="w-full h-auto max-h-96 object-cover rounded-lg mb-4"
                 onError={(e) => {
-                  console.log('Image failed to load:', e.target.src);
+                  console.log("Image failed to load:", e.target.src);
                   setImageError(true);
                 }}
               />
@@ -134,40 +147,55 @@ const DestinasiDetail = () => {
               <div className="w-full h-96 bg-gradient-to-br from-[#3A59D1] to-[#2d47b8] rounded-lg mb-4 flex items-center justify-center text-white">
                 <div className="text-center">
                   <div className="text-6xl mb-4">🏖️</div>
-                  <div className="text-lg font-medium">Gambar Tidak Tersedia</div>
-                  <div className="text-sm opacity-80 mt-1">{destinationName}</div>
+                  <div className="text-lg font-medium">
+                    Gambar Tidak Tersedia
+                  </div>
+                  <div className="text-sm opacity-80 mt-1">
+                    {destinationName}
+                  </div>
                 </div>
               </div>
             )}
           </div>
-          
+
           <div>
-            <h1 className="text-3xl font-bold text-blue-800 mb-2">{destinationName}</h1>
+            <h1 className="text-3xl font-bold text-blue-800 mb-2">
+              {destinationName}
+            </h1>
             <p className="text-sm text-gray-500 italic mb-4">
-              {detail.kota_kabupaten || detail.kota || detail.kabupaten || ''}, {detail.provinsi || ''}
+              {detail.kota_kabupaten || detail.kota || detail.kabupaten || ""},{" "}
+              {detail.provinsi || ""}
             </p>
             <p className="text-gray-700 text-base">
-              {detail.deskripsi_bersih || detail.deskripsi || detail.description || 'Deskripsi tidak tersedia'}
+              {console.log("Debug deskripsi:", detail)}
+              {detail.deskripsi_bersih ||
+                detail.deskripsi ||
+                detail.description ||
+                "Deskripsi tidak tersedia"}
             </p>
 
             <div className="mt-4 text-left">
               <h2 className="text-xl font-semibold text-gray-800">📍 Alamat</h2>
               <p className="text-gray-600 pl-2">
-                {detail.alamat || detail.address || 'Alamat tidak tersedia'}
+                {detail.alamat || detail.address || "Alamat tidak tersedia"}
               </p>
             </div>
 
             <div className="mt-4">
-              <h2 className="text-xl font-semibold text-gray-800">Kategori Wisata</h2>
+              <h2 className="text-xl font-semibold text-gray-800">
+                Kategori Wisata
+              </h2>
               <p className="text-gray-600">
-                {detail.kategori || detail.category || 'Kategori tidak tersedia'}
+                {detail.kategori ||
+                  detail.category ||
+                  "Kategori tidak tersedia"}
               </p>
             </div>
           </div>
         </div>
 
         {/* Tampilan Google Maps */}
-        {(latitude && longitude) && (
+        {latitude && longitude && (
           <div className="mt-6">
             <h2 className="text-xl font-semibold text-gray-800">Lokasi</h2>
             <div className="w-full overflow-hidden rounded-lg">

@@ -1,8 +1,11 @@
-import { useState, useEffect, useRef } from "react"; 
+import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 import classNames from "classnames";
-import "../../../src/index.css"; 
+import "../../../src/index.css";
 
 const dataGambar = {
   Pantai: [
@@ -15,8 +18,11 @@ const dataGambar = {
   "Air Terjun": [
     "/image/airterjun_madakaripura.webp",
     "/image/airterjun_kantolampo.webp",
+    "/image/airterjun2.jpg",
+    "/image/air-terjun-aling-aling.jpg",
+    "/image/Air-Terjun-Mangku-Sakti.jpg",
   ],
-  Lainnya: ["/image/pantai_sawarna.jpg"],
+  Lainnya: ["/image/candi1.jpg", "/image/candi2.jpg", "/image/candi3.jpg","/image/candi4.jpg","image/candi5.jpg"]
 };
 
 // Buat kategori "Semua" dari gabungan semua
@@ -30,8 +36,8 @@ const KategoriSection = () => {
   const [kategoriAktif, setKategoriAktif] = useState("Pantai");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const [isContentVisible, setIsContentVisible] = useState(true); 
-  const animationTimeout = useRef(null); 
+  const [isContentVisible, setIsContentVisible] = useState(true);
+  const animationTimeout = useRef(null);
 
   const gambarAktif = dataGambar[kategoriAktif];
 

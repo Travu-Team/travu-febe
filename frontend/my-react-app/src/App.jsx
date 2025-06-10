@@ -9,8 +9,6 @@ import About from "./pages/About";
 import ProfileUser from "./pages/ProfileUser";
 import Search from "./pages/Search";
 import TravelPlan from "./pages/plan/TravelPlan";
-import ForgotPassword from "./utils/LupaSandi";
-import ResetPassword from "./utils/resetPasword";
 import { Toaster } from "react-hot-toast";
 
 const App = () => {
@@ -27,8 +25,7 @@ const App = () => {
         <Route path="/search" element={<Search />} />
         <Route path="/profile" element={<ProfileUser />} />
         <Route path="/plan" element={<TravelPlan />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        
         <Route
           path="*"
           element={ 
