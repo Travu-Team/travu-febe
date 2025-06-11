@@ -10,19 +10,20 @@ import {
   faArrowLeft,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate, useSearchParams } from "react-router-dom"; // Tambahkan useSearchParams
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const Search = () => {
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filtered, setFiltered] = useState([]);
+  const [isInitialized, setIsInitialized] = useState(false); // Flag untuk mencegah loop
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams(); // Untuk membaca dan mengatur parameter URL
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const csvFilePath = "/wisata_indonesia_final_fix.csv";
 
+  // Load CSV data
   useEffect(() => {
-    // Muat data CSV
     Papa.parse(csvFilePath, {
       download: true,
       header: true,
@@ -34,32 +35,56 @@ const Search = () => {
     });
   }, []);
 
+  // Initialize search term from URL (hanya sekali saat pertama load)
   useEffect(() => {
-    // Inisialisasi searchTerm dari URL saat pertama kali dimuat
-    const queryParam = searchParams.get("query");
-    if (queryParam && !searchTerm) {
-      const decodedQuery = decodeURIComponent(queryParam).trim();
-      setSearchTerm(decodedQuery); // Set hanya jika searchTerm masih kosong
+    if (!isInitialized) {
+      const queryParam = searchParams.get("query");
+      if (queryParam) {
+        const decodedQuery = decodeURIComponent(queryParam).trim();
+        setSearchTerm(decodedQuery);
+      }
+      setIsInitialized(true);
     }
+  }, [searchParams, isInitialized]);
 
-    // Filter data berdasarkan searchTerm
+  // Filter data berdasarkan searchTerm
+  useEffect(() => {
+    if (data.length === 0) return;
+
     const filteredData = data.filter((item) => {
+      if (!searchTerm || searchTerm.trim() === "") return false;
+      
       const namaWisata = item.nama_wisata?.toLowerCase() || "";
       return namaWisata.includes(searchTerm.toLowerCase());
     });
 
     console.log("🎯 Filtered:", filteredData.length, "results");
     setFiltered(filteredData);
-  }, [data, searchParams, searchTerm]); // Tambahkan searchParams untuk inisialisasi awal
+  }, [data, searchTerm]);
 
   const handleSearchSubmit = (e) => {
-    if (e.key === "Enter" && searchTerm.trim() !== "") {
-      setSearchParams({ query: encodeURIComponent(searchTerm.trim()) }); // Perbarui URL dengan query baru
+    if (e.key === "Enter") {
+      if (searchTerm.trim() !== "") {
+        setSearchParams({ query: encodeURIComponent(searchTerm.trim()) });
+      } else {
+        // Jika search term kosong, hapus parameter query dari URL
+        setSearchParams({});
+      }
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    // Jika user menghapus semua text, hapus juga parameter dari URL
+    if (value.trim() === "") {
+      setSearchParams({});
     }
   };
 
   const handleBack = () => {
-    navigate("/"); // Navigate to home page
+    navigate("/");
   };
 
   return (
@@ -93,8 +118,8 @@ const Search = () => {
                 className="w-full pl-10 pr-4 py-2.5 border bg-white border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500"
                 placeholder="Cari tempat wisata..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={handleSearchSubmit} // Trigger search on Enter
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchSubmit}
               />
             </div>
           </div>
@@ -103,11 +128,13 @@ const Search = () => {
         {/* Results Section */}
         <div className="max-w-6xl mx-auto px-4 py-6">
           {/* Results Count */}
-          <div className="mb-6">
-            <p className="text-gray-600 text-sm">
-              Menampilkan {filtered.length} hasil untuk "{searchTerm}"
-            </p>
-          </div>
+          {searchTerm && (
+            <div className="mb-6">
+              <p className="text-gray-600 text-sm">
+                Menampilkan {filtered.length} hasil untuk "{searchTerm}"
+              </p>
+            </div>
+          )}
 
           {/* Results Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

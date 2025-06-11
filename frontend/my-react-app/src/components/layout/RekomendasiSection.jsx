@@ -1,5 +1,5 @@
 // src/components/layout/RekomendasiSection.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import RecommendationCard from "../RecommendationCard";
 import { recommendationService } from "../../services/recommendationService";
@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 
 const RekomendasiSection = () => {
   const navigate = useNavigate();
+  const scrollContainerRef = useRef(null);
   const [recommendations, setRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,10 +18,50 @@ const RekomendasiSection = () => {
     hasError: false
   });
   const [showProfileAlert, setShowProfileAlert] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   useEffect(() => {
     fetchRecommendations();
   }, []);
+
+  // Check scroll position untuk enable/disable navigation buttons
+  const checkScrollPosition = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  };
+
+  // Update scroll position saat recommendations berubah
+  useEffect(() => {
+    if (recommendations.length > 0) {
+      setTimeout(() => {
+        checkScrollPosition();
+      }, 100);
+    }
+  }, [recommendations]);
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      const cardWidth = 320; // Approximate width of one card + gap
+      scrollContainerRef.current.scrollBy({
+        left: -cardWidth * 2, // Scroll 2 cards at a time
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      const cardWidth = 320; // Approximate width of one card + gap
+      scrollContainerRef.current.scrollBy({
+        left: cardWidth * 2, // Scroll 2 cards at a time
+        behavior: 'smooth'
+      });
+    }
+  };
 
   const checkUserProfile = async () => {
     try {
@@ -346,23 +387,66 @@ const RekomendasiSection = () => {
         </div>
       ) : (
         <>
-          {/* Carousel Style - Ada rekomendasi */}
-          <div className="w-full overflow-x-auto scrollbar-hide px-1">
-            <div className="flex gap-6 w-max snap-x snap-mandatory scroll-smooth px-1">
-              {recommendations.map((recommendation, index) => (
-                <RecommendationCard 
-                  key={recommendation.id || recommendation.nama_wisata || index} 
-                  recommendation={recommendation} 
-                />
-              ))}
+          {/* Carousel dengan Navigation Buttons untuk Desktop */}
+          <div className="w-full relative">
+            {/* Navigation Buttons - Hidden on mobile */}
+            <div className="hidden lg:block">
+              {/* Previous Button */}
+              <button
+                onClick={scrollLeft}
+                disabled={!canScrollLeft}
+                className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 ${
+                  canScrollLeft
+                    ? 'bg-[#3A59D1] hover:bg-[#2d47b8] text-white hover:shadow-xl cursor-pointer'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                }`}
+                style={{ marginLeft: '-24px' }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+
+              {/* Next Button */}
+              <button
+                onClick={scrollRight}
+                disabled={!canScrollRight}
+                className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 ${
+                  canScrollRight
+                    ? 'bg-[#3A59D1] hover:bg-[#2d47b8] text-white hover:shadow-xl cursor-pointer'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                }`}
+                style={{ marginRight: '-24px' }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+
+            {/* Scrollable Container */}
+            <div 
+              ref={scrollContainerRef}
+              className="w-full overflow-x-auto scrollbar-hide px-1"
+              onScroll={checkScrollPosition}
+            >
+              <div className="flex gap-6 w-max snap-x snap-mandatory scroll-smooth px-1">
+                {recommendations.map((recommendation, index) => (
+                  <RecommendationCard 
+                    key={recommendation.id || recommendation.nama_wisata || index} 
+                    recommendation={recommendation} 
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Scroll Indicator */}
+          {/* Scroll Indicator - Updated untuk desktop/mobile */}
           {recommendations.length > 3 && (
             <div className="flex justify-center mt-4">
               <p className="text-sm text-gray-500">
-                ← Geser untuk melihat lebih banyak rekomendasi →
+                <span className="lg:hidden">← Geser untuk melihat lebih banyak rekomendasi →</span>
+                <span className="hidden lg:inline">Gunakan tombol navigasi untuk melihat lebih banyak rekomendasi</span>
               </p>
             </div>
           )}
