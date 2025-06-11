@@ -2,10 +2,14 @@
 nixPkgs = ["nodejs", "npm"]
 
 [phases.install]
-cmds = ["cd frontend/my-react-app && npm ci"]
+cmds = ["npm install"]
 
 [phases.build]
-cmds = ["cd frontend/my-react-app && npm run build"]
+cmds = [
+  "cd frontend/my-react-app",
+  "npm ci",
+  "npm run build"
+]
 
 [start]
-cmd = "cd frontend/my-react-app && npx serve dist -l 3000"
+cmd = "npm start"
