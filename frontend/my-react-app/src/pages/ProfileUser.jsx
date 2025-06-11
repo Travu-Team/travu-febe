@@ -383,7 +383,7 @@ useEffect(() => {
         
         <div className="flex flex-col lg:flex-row gap-6 w-full max-w-7xl mx-auto">
           <aside className="w-full lg:w-1/4">
-            <div className="bg-secondary/30 p-4 sm:p-6 rounded-lg shadow-md">
+            <div className="bg-secondary/30 p-4 sm:p-6 rounded-lg shadow-md text-gray-800">
               <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-gray-800">
                 Navigasi Profil
               </h2>
