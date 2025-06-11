@@ -1,71 +1,134 @@
 // src/components/layout/RekomendasiSection.jsx
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import RecommendationCard from "../RecommendationCard";
 import { recommendationService } from "../../services/recommendationService";
 import { authService } from "../../services/authService";
 import toast from "react-hot-toast";
 
 const RekomendasiSection = () => {
+  const navigate = useNavigate();
   const [recommendations, setRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [profileStatus, setProfileStatus] = useState({
+    isComplete: false,
+    isIncomplete: false,
+    hasError: false
+  });
+  const [showProfileAlert, setShowProfileAlert] = useState(false);
 
   useEffect(() => {
     fetchRecommendations();
   }, []);
 
+  const checkUserProfile = async () => {
+    try {
+      // Cek apakah user sudah mengisi interest dan domisili
+      const userProfile = await authService.getUserProfile();
+      
+      const hasInterests = userProfile?.interests && userProfile.interests.length > 0;
+      const hasDomicile = userProfile?.domicile || userProfile?.alamat || userProfile?.address;
+      
+      if (!hasInterests || !hasDomicile) {
+        setProfileStatus({
+          isComplete: false,
+          isIncomplete: true,
+          hasError: false
+        });
+        
+        // Show alert hanya sekali saat pertama kali akses
+        const hasShownAlert = localStorage.getItem('profileAlertShown');
+        if (!hasShownAlert) {
+          setShowProfileAlert(true);
+          localStorage.setItem('profileAlertShown', 'true');
+        }
+        
+        return false;
+      }
+      
+      setProfileStatus({
+        isComplete: true,
+        isIncomplete: false,
+        hasError: false
+      });
+      return true;
+    } catch (err) {
+      console.error('Error checking user profile:', err);
+      setProfileStatus({
+        isComplete: true, // Assume complete if error, to proceed with recommendation fetch
+        isIncomplete: false,
+        hasError: true
+      });
+      return true;
+    }
+  };
+
   const fetchRecommendations = async () => {
     try {
       setIsLoading(true);
       setError(null);
+      setProfileStatus({
+        isComplete: false,
+        isIncomplete: false,
+        hasError: false
+      });
 
       // Pastikan user sudah login
       if (!authService.isAuthenticated()) {
-        setError("Anda harus login untuk melihat rekomendasi");
+        setError("Silakan masuk ke akun Anda terlebih dahulu untuk melihat rekomendasi wisata yang sesuai dengan preferensi Anda.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Cek kelengkapan profil user
+      const profileComplete = await checkUserProfile();
+      if (!profileComplete) {
         setIsLoading(false);
         return;
       }
 
       const response = await recommendationService.getRecommendations();
-      console.log("Recommendation Service Response:", response); // Debug log
-
+      
       // Validasi response
       if (Array.isArray(response)) {
-        console.log(
-          "Valid recommendations array received:",
-          response.length,
-          "items"
-        );
         setRecommendations(response);
-
-        if (response.length === 0) {
-          setError(
-            "Tidak ada rekomendasi yang tersedia. Pastikan Anda sudah mengisi profil dengan interest dan alamat."
-          );
-        }
       } else {
-        console.warn("Response is not an array:", typeof response, response);
         setRecommendations([]);
-        setError("Format data rekomendasi tidak valid");
+        // Jangan set error di sini, biarkan komponen menampilkan empty state
       }
+      
     } catch (err) {
-      console.error("Error fetching recommendations:", err);
-      setError(err.message || "Gagal memuat rekomendasi");
-      setRecommendations([]);
-
-      // Tampilkan toast error
-      toast.error(
-        err.message ||
-          "Gagal memuat rekomendasi. Pastikan Anda sudah mengisi profil dengan interest dan alamat.",
-        {
-          duration: 5000,
+      console.error('Fetch recommendations error:', err);
+      
+      // Cek apakah error karena profil tidak lengkap atau error lainnya
+      if (err.message && (
+        err.message.includes("profil") || 
+        err.message.includes("interest") || 
+        err.message.includes("domisili") ||
+        err.message.includes("alamat") ||
+        err.message.includes("address")
+      )) {
+        setProfileStatus({
+          isComplete: false,
+          isIncomplete: true,
+          hasError: false
+        });
+      } else {
+        setError("Gagal memuat rekomendasi wisata. Pastikan koneksi internet Anda stabil dan coba lagi.");
+        
+        // Tampilkan toast error hanya untuk error teknis
+        toast.error("Gagal memuat rekomendasi wisata. Silakan periksa koneksi internet dan coba lagi.", {
+          duration: 4000,
           style: {
-            background: "#fee",
+            background: "#fee2e2",
             border: "1px solid #f87171",
             color: "#dc2626",
           },
-        }
-      );
+        });
+      }
+      
+      setRecommendations([]);
     } finally {
       setIsLoading(false);
     }
@@ -74,6 +137,53 @@ const RekomendasiSection = () => {
   const handleRetry = () => {
     fetchRecommendations();
   };
+
+  const handleGoToProfile = () => {
+    navigate('/profile');
+  };
+
+  const handleCloseAlert = () => {
+    setShowProfileAlert(false);
+  };
+
+  // Alert untuk mengisi profil
+  const ProfileAlert = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+        <div className="text-center">
+          <div className="text-5xl mb-4">👤</div>
+          <h3 className="text-xl font-bold text-gray-800 mb-2">
+            Lengkapi Profil Anda
+          </h3>
+          <p className="text-gray-600 mb-6 leading-relaxed">
+            Untuk mendapatkan rekomendasi wisata yang sesuai dengan minat Anda, 
+            silakan lengkapi terlebih dahulu informasi domisili dan minat di bagian profil.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={handleCloseAlert}
+              className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-300 transition-colors duration-200"
+            >
+              Nanti Saja
+            </button>
+            <button
+              onClick={() => {
+                handleCloseAlert();
+                handleGoToProfile();
+              }}
+              className="flex-1 bg-[#3A59D1] text-white px-4 py-2 rounded-xl font-medium hover:bg-[#2d47b8] transition-colors duration-200"
+            >
+              Ke Profil
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (showProfileAlert) {
+    return <ProfileAlert />;
+  }
 
   if (isLoading) {
     return (
@@ -86,18 +196,55 @@ const RekomendasiSection = () => {
             Pilihan wisata yang cocok untuk Anda
           </p>
         </div>
-
+        
         {/* Loading State */}
         <div className="w-full flex justify-center items-center py-12">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3A59D1] mx-auto mb-4"></div>
-            <p className="text-gray-600 text-lg">Memuat rekomendasi...</p>
+            <p className="text-gray-600 text-lg">Sedang memuat rekomendasi wisata untuk Anda...</p>
           </div>
         </div>
       </div>
     );
   }
 
+  // State: Profil belum lengkap
+  if (profileStatus.isIncomplete) {
+    return (
+      <div className="w-full flex flex-col items-center gap-6 px-4 md:px-8 lg:px-20 py-10">
+        <div className="w-full max-w-screen-xl">
+          <h2 className="text-[#3A59D1] text-2xl md:text-3xl lg:text-4xl font-semibold font-poppins mb-4">
+            Rekomendasi Wisata
+          </h2>
+          <p className="text-[#0F0F0F] text-lg md:text-xl lg:text-xl font-medium font-poppins mb-8">
+            Lengkapi profil untuk mendapatkan rekomendasi
+          </p>
+        </div>
+        
+        {/* Profile Incomplete State */}
+        <div className="w-full flex justify-center items-center py-12">
+          <div className="text-center max-w-lg">
+            <div className="text-[#3A59D1] text-6xl mb-4">📝</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              Profil Belum Lengkap
+            </h3>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              Anda belum mengisi <strong>lokasi destinasi</strong> dan <strong>minat wisata</strong> di profil Anda. 
+              Silakan lengkapi informasi ini untuk mendapatkan rekomendasi wisata yang sesuai dengan preferensi Anda.
+            </p>
+            <button
+              onClick={handleGoToProfile}
+              className="bg-[#3A59D1] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#2d47b8] transition-colors duration-200"
+            >
+              Lengkapi Profil Sekarang
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // State: Error teknis (koneksi, server, dll)
   if (error) {
     return (
       <div className="w-full flex flex-col items-center gap-6 px-4 md:px-8 lg:px-20 py-10">
@@ -109,55 +256,22 @@ const RekomendasiSection = () => {
             Pilihan wisata yang cocok untuk Anda
           </p>
         </div>
-
-        {/* Error State */}
+        
+        {/* Technical Error State */}
         <div className="w-full flex justify-center items-center py-12">
-          <div className="text-center max-w-md">
+          <div className="text-center max-w-lg">
             <div className="text-red-500 text-6xl mb-4">⚠️</div>
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              Oops! Terjadi Kesalahan
+              Ups! Ada Kendala Teknis
             </h3>
-            <p className="text-gray-600 mb-6">{error}</p>
-            <button
-              onClick={handleRetry}
-              className="bg-[#3A59D1] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#2d47b8] transition-colors duration-200"
-            >
-              Coba Lagi
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!Array.isArray(recommendations) || recommendations.length === 0) {
-    return (
-      <div className="w-full flex flex-col items-center gap-6 px-4 md:px-8 lg:px-20 py-10">
-        <div className="w-full max-w-screen-xl">
-          <h2 className="text-[#3A59D1] text-2xl md:text-3xl lg:text-4xl font-semibold font-poppins mb-4">
-            Rekomendasi Wisata
-          </h2>
-          <p className="text-[#0F0F0F] text-lg md:text-xl lg:text-xl font-medium font-poppins mb-8">
-            Pilihan wisata yang cocok untuk Anda
-          </p>
-        </div>
-
-        {/* Empty State */}
-        <div className="w-full flex justify-center items-center py-12">
-          <div className="text-center max-w-md">
-            <div className="text-gray-400 text-6xl mb-4">🏖️</div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              Belum Ada Rekomendasi
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Untuk mendapatkan rekomendasi wisata yang personal, lengkapi
-              profil Anda dengan interest dan alamat terlebih dahulu.
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              {error}
             </p>
             <button
               onClick={handleRetry}
               className="bg-[#3A59D1] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#2d47b8] transition-colors duration-200"
             >
-              Muat Ulang
+              Coba Lagi
             </button>
           </div>
         </div>
@@ -173,30 +287,86 @@ const RekomendasiSection = () => {
           Rekomendasi Wisata
         </h2>
         <p className="text-[#0F0F0F] text-lg md:text-xl lg:text-xl font-medium font-poppins mb-8">
-          Pilihan wisata yang cocok untuk Anda ({recommendations.length}{" "}
-          destinasi)
+          {recommendations.length === 0 && profileStatus.isComplete
+            ? "Belum ada rekomendasi yang sesuai dengan preferensi Anda" 
+            : recommendations.length === 0
+            ? "Mengumpulkan rekomendasi wisata untuk Anda" 
+            : `Pilihan wisata yang cocok untuk Anda (${recommendations.length} destinasi)`
+          }
         </p>
       </div>
 
-      {/* Carousel Style */}
-      <div className="w-full overflow-x-auto scrollbar-hide px-1">
-        <div className="flex gap-6 w-max snap-x snap-mandatory scroll-smooth px-1">
-          {recommendations.map((recommendation, index) => (
-            <RecommendationCard
-              key={recommendation.id || recommendation.nama_wisata || index}
-              recommendation={recommendation}
-            />
-          ))}
+      {/* State: Profil lengkap tapi tidak ada rekomendasi */}
+      {recommendations.length === 0 && profileStatus.isComplete ? (
+        <div className="w-full flex justify-center items-center py-12">
+          <div className="text-center max-w-lg">
+            <div className="text-gray-400 text-6xl mb-4">🔍</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              Belum Ada Rekomendasi
+            </h3>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              Maaf, saat ini belum ada rekomendasi wisata yang sesuai dengan <strong>minat</strong> dan <strong>lokasi</strong> yang Anda pilih. 
+              Coba ubah preferensi di profil Anda atau periksa kembali nanti.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={handleRetry}
+                className="bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-300 transition-colors duration-200"
+              >
+                Muat Ulang
+              </button>
+              <button
+                onClick={handleGoToProfile}
+                className="bg-[#3A59D1] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#2d47b8] transition-colors duration-200"
+              >
+                Ubah Preferensi
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      ) : recommendations.length === 0 ? (
+        // State: Loading atau initial state
+        <div className="w-full flex justify-center items-center py-12">
+          <div className="text-center max-w-lg">
+            <div className="text-gray-400 text-6xl mb-4">🎯</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              Menyiapkan Rekomendasi
+            </h3>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              Kami sedang mengumpulkan rekomendasi wisata terbaik berdasarkan preferensi Anda. 
+              Mohon tunggu sebentar...
+            </p>
+            <button
+              onClick={handleRetry}
+              className="bg-[#3A59D1] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#2d47b8] transition-colors duration-200"
+            >
+              Muat Rekomendasi
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Carousel Style - Ada rekomendasi */}
+          <div className="w-full overflow-x-auto scrollbar-hide px-1">
+            <div className="flex gap-6 w-max snap-x snap-mandatory scroll-smooth px-1">
+              {recommendations.map((recommendation, index) => (
+                <RecommendationCard 
+                  key={recommendation.id || recommendation.nama_wisata || index} 
+                  recommendation={recommendation} 
+                />
+              ))}
+            </div>
+          </div>
 
-      {/* Scroll Indicator */}
-      {recommendations.length > 3 && (
-        <div className="flex justify-center mt-4">
-          <p className="text-sm text-gray-500">
-            ← Geser untuk melihat lebih banyak rekomendasi →
-          </p>
-        </div>
+          {/* Scroll Indicator */}
+          {recommendations.length > 3 && (
+            <div className="flex justify-center mt-4">
+              <p className="text-sm text-gray-500">
+                ← Geser untuk melihat lebih banyak rekomendasi →
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

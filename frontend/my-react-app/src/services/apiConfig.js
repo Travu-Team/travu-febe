@@ -43,9 +43,13 @@ class ApiClient {
     if (error.message) {
       // Remove URL dari error message
       let sanitizedMessage = error.message
-        .replace(/http[s]?:\/\/[^\s]+/g, '[API_ENDPOINT]')
-        .replace(/GET|POST|PUT|DELETE/g, '[HTTP_METHOD]')
-        .replace(/\d{3}\s\([^)]+\)/g, '[HTTP_STATUS]');
+        .replace(/http[s]?:\/\/[^\s\)\,]+/g, '[HIDDEN_URL]')
+        .replace(/GET|POST|PUT|DELETE\s+/g, '')
+        .replace(/\d{3}\s\([^)]+\)/g, '[HTTP_STATUS]')
+        .replace(/fetch\(\)/g, 'network request')
+        .replace(/Failed to fetch/gi, 'Connection failed')
+        .replace(/NetworkError/gi, 'Connection failed')
+        .replace(/at\s+http[s]?:\/\/[^\s]+/g, '');
 
       return sanitizedMessage;
     }
@@ -82,23 +86,44 @@ class ApiClient {
       if (!response.ok) {
         // Gunakan message dari API jika ada, atau buat generic message
         const errorMessage = data.message || data.error || `Request failed with status ${response.status}`;
-        throw new Error(errorMessage);
+        
+        // Buat custom error tanpa URL
+        const sanitizedError = new Error(this.sanitizeErrorMessage(new Error(errorMessage)));
+        
+        // Override stack trace untuk menghilangkan URL
+        if (sanitizedError.stack) {
+          sanitizedError.stack = sanitizedError.stack.replace(/http[s]?:\/\/[^\s\)]+/g, '[HIDDEN_URL]');
+        }
+        
+        throw sanitizedError;
       }
 
       return data;
     } catch (error) {
-      // Log error untuk debugging (hanya di development)
+      // Buat error baru tanpa informasi URL
+      const cleanError = new Error(this.sanitizeErrorMessage(error));
+      
+      // Override stack trace untuk menghilangkan URL
+      if (cleanError.stack) {
+        cleanError.stack = cleanError.stack.replace(/http[s]?:\/\/[^\s\)]+/g, '[HIDDEN_URL]');
+      }
+      
+      // Override name dan message error untuk menghilangkan URL
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        cleanError.name = 'NetworkError';
+        cleanError.message = 'Unable to connect to server';
+      }
+      
+      // Log error untuk debugging (hanya di development) - TANPA URL
       if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development'){
         console.error('API request failed:', {
-          endpoint,
-          error: error.message,
-          // Jangan log full URL untuk keamanan
+          endpoint: endpoint.replace(/\?.*$/, ''), // Remove query params juga
+          method: options.method || 'GET',
+          status: 'Connection Failed'
         });
       }
       
-      // Sanitasi error message sebelum di-throw
-      const sanitizedMessage = this.sanitizeErrorMessage(error);
-      throw new Error(sanitizedMessage);
+      throw cleanError;
     }
   }
 

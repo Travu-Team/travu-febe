@@ -1,1 +1,11 @@
-/*    /index.html   200
+# Redirect API requests ke backend
+/api/*  https://backend.travuu-project.et.r.appspot.com/api/:splat  200
+
+# Redirect file statis jika ada kebutuhan akses ke file dari backend
+/files/*  https://backend.travuu-project.et.r.appspot.com/files/:splat  200
+
+# Redirect halaman SPA agar semua request yang tidak dikenali diarahkan ke index.html
+/*  /index.html  200
+
+/api/*  /.netlify/functions/proxy  200
+

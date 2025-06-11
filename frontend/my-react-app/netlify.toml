@@ -1,8 +1,0 @@
-[build]
-  command = "npm run build" # Perintah build 
-  publish = "dist"          # Folder output build 
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
