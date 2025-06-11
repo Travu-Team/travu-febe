@@ -19,7 +19,7 @@ const Search = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams(); // Untuk membaca dan mengatur parameter URL
 
-  const csvFilePath = "/src/data/wisata_indonesia_final_fix.csv";
+  const csvFilePath = "/wisata_indonesia_final_fix.csv";
 
   useEffect(() => {
     // Muat data CSV
