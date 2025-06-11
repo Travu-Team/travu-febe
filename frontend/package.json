@@ -1,5 +1,10 @@
 {
+  "name": "travuu-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "serve -s frontend/my-react-app/dist -p $PORT"
+  },
   "dependencies": {
-    "serve": "^14.2.4"
+    "serve": "^14.2.0"
   }
 }
