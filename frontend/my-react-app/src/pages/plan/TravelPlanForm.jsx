@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faExclamationTriangle, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const TravelPlanForm = ({ visible, onClose, editingPlan }) => {
   const [selectedProvince, setSelectedProvince] = useState('');
@@ -22,7 +24,7 @@ const TravelPlanForm = ({ visible, onClose, editingPlan }) => {
   // Mengambil data dari file CSV saat modal terbuka
   useEffect(() => {
     if (visible) {
-      fetch('/src/data/wisata_indonesia_final_fix.csv')
+      fetch('/wisata_indonesia_final_fix.csv')
         .then(res => res.text())
         .then(csvText => {
           const result = Papa.parse(csvText, { header: true });
@@ -105,10 +107,10 @@ const TravelPlanForm = ({ visible, onClose, editingPlan }) => {
     }));
   };
 
-  const handleDateChange = (e) => {
+  const handleDateChange = (date) => {
     setTravelPlan(prev => ({
       ...prev,
-      date: e.target.value
+      date: date ? date.toISOString().split('T')[0] : ''
     }));
   };
 
@@ -311,7 +313,8 @@ const TravelPlanForm = ({ visible, onClose, editingPlan }) => {
     <Modal
       open={visible}
       onCancel={handleCancel}
-      width= "85vw"
+      width="85vw"
+      className="lg:w-1/2 lg:!max-w-[800px]"
       title="Tambah Rencana Wisata"
       footer={null}
       destroyOnClose={false}
@@ -340,16 +343,18 @@ const TravelPlanForm = ({ visible, onClose, editingPlan }) => {
               Rencana Pergi <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <input
-                type="date"
-                className="w-full border rounded-md p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
-                value={travelPlan.date}
+              <DatePicker
+                selected={travelPlan.date ? new Date(travelPlan.date) : null}
                 onChange={handleDateChange}
-                min={new Date().toISOString().split('T')[0]}
+                dateFormat="dd/MM/yyyy"
+                minDate={new Date()}
+                placeholderText="Pilih tanggal"
+                className="w-full border rounded-md p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+                wrapperClassName="w-full"
               />
               <FontAwesomeIcon 
                 icon={faCalendarAlt} 
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 pointer-events-none"
               />
             </div>
           </div>
