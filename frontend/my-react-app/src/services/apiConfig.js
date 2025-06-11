@@ -1,6 +1,6 @@
 // src/services/apiConfig.js
 export const API_CONFIG = {
-  BASE_URL: 'http://backend.travuu-project.et.r.appspot.com',
+  BASE_URL: 'https://backend-dot-travuu-project.et.r.appspot.com',
   ENDPOINTS: {
     // Health Check
     HEALTH: '/health',

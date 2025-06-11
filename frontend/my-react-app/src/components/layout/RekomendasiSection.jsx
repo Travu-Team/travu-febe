@@ -54,7 +54,7 @@ const RekomendasiSection = () => {
       });
       return true;
     } catch (err) {
-      console.error('Error checking user profile:', err);
+      console.error('Error cek profile anda:', err);
       setProfileStatus({
         isComplete: true, // Assume complete if error, to proceed with recommendation fetch
         isIncomplete: false,

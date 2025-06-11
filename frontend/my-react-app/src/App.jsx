@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import RegisterPage from "./register/RegisterPage";
 import LoginPage from "./login/LoginPage";
@@ -9,9 +9,31 @@ import About from "./pages/About";
 import ProfileUser from "./pages/ProfileUser";
 import Search from "./pages/Search";
 import TravelPlan from "./pages/plan/TravelPlan";
+import NoteFund from "./components/NoteFund"; // Import komponen 404
+import OfflineNavbar from "./components/OfflineNavbar";
 import { Toaster } from "react-hot-toast";
 
 const App = () => {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Show offline navbar when offline
+  if (!isOnline) {
+    return <OfflineNavbar />;
+  }
+
   return (
     <Router>
       <Toaster position="top-center" reverseOrder={false} />
@@ -26,13 +48,11 @@ const App = () => {
         <Route path="/profile" element={<ProfileUser />} />
         <Route path="/plan" element={<TravelPlan />} />
         
+        {/* Route 404 - harus di paling bawah */}
         <Route
           path="*"
-          element={ 
-            <h1 className="text-center text-red-600 text-3xl mt-10">
-              404: Not Found <br />
-              Halaman tidak ditemukan
-            </h1>
+          element={
+            <NoteFund onNavigateHome={() => window.location.href = '/'} />
           }
         />
       </Routes>

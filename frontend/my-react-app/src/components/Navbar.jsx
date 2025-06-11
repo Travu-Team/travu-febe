@@ -97,6 +97,15 @@ const Navbar = () => {
     }
   };
 
+  // Handle protected navigation
+  const handleProtectedNavigation = (e, path) => {
+    if (!user) {
+      e.preventDefault();
+      alert("Silakan login terlebih dahulu untuk mengakses halaman ini");
+      window.location.href = "/login";
+    }
+  };
+
   return (
     <nav className="w-full bg-white h-[60px] shadow-md z-50 relative">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-full">
@@ -117,17 +126,19 @@ const Navbar = () => {
           </a>
           <a
             href="/about"
+            onClick={!user ? (e) => handleProtectedNavigation(e, "/about") : undefined}
             className={`text-[#6a7bd9] ${
               window.location.pathname === "/about" ? "font-bold" : ""
-            } hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
+            } ${!user ? "opacity-50 cursor-not-allowed" : ""} hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
           >
             Tentang Kami
           </a>
           <a
             href="/plan"
+            onClick={!user ? (e) => handleProtectedNavigation(e, "/plan") : undefined}
             className={`text-[#6a7bd9] ${
               window.location.pathname === "/plan" ? "font-bold" : ""
-            } hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
+            } ${!user ? "opacity-50 cursor-not-allowed" : ""} hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
           >
             Rencana Wisata
           </a>
@@ -161,7 +172,7 @@ const Navbar = () => {
                       href="/profile"
                       className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-gray-200 hover:text-gray-800 font-normal no-underline focus:outline-none"
                     >
-                      Settings
+                      Pengaturan
                     </a>
                   </li>
                   <li>
@@ -169,12 +180,22 @@ const Navbar = () => {
                       onClick={handleLogout}
                       className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-gray-200 hover:text-gray-800 font-normal focus:outline-none"
                     >
-                      Sign Out
+                      Keluar
                     </button>
                   </li>
                 </ul>
               )}
             </div>
+          )}
+
+          {/* Login button when user is not logged in */}
+          {!user && (
+            <a
+              href="/login"
+              className="bg-[#3a59d1] text-white px-4 py-2 rounded-full font-semibold hover:bg-[#2d4aa1] transition"
+            >
+              Masuk
+            </a>
           )}
 
           {/* Search Toggle (Desktop) */}
@@ -230,6 +251,16 @@ const Navbar = () => {
                 </ul>
               )}
             </div>
+          )}
+
+          {/* Login button when user is not logged in (Mobile) */}
+          {!user && (
+            <a
+              href="/login"
+              className="bg-[#3a59d1] text-white px-3 py-1 rounded-full text-sm font-semibold hover:bg-[#2d4aa1] transition"
+            >
+              Masuk
+            </a>
           )}
 
           {/* Search Toggle */}
@@ -289,7 +320,8 @@ const Navbar = () => {
             <li>
               <a
                 href="/about"
-                className="block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded"
+                onClick={!user ? (e) => handleProtectedNavigation(e, "/about") : undefined}
+                className={`block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded ${!user ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 Tentang Kami
               </a>
@@ -297,7 +329,8 @@ const Navbar = () => {
             <li>
               <a
                 href="/plan"
-                className="block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded"
+                onClick={!user ? (e) => handleProtectedNavigation(e, "/plan") : undefined}
+                className={`block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded ${!user ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 Rencana Wisata
               </a>
