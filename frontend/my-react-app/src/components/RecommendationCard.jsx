@@ -101,14 +101,14 @@ const RecommendationCard = ({ recommendation }) => {
   const imageUrl = getImageUrl();
 
   return (
-    <div className="snap-start w-[280px] sm:w-[300px] md:w-[320px] lg:w-[340px] flex-shrink-0 bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-      {/* Image Container */}
-      <div className="relative overflow-hidden">
+    <div className="snap-start w-[280px] sm:w-[300px] md:w-[320px] lg:w-[340px] flex-shrink-0 bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col">
+      {/* Image Container - Konsisten dengan aspek rasio */}
+      <div className="relative overflow-hidden aspect-[4/3] flex-shrink-0">
         {imageUrl ? (
           <img
             src={imageUrl}
             alt={getDestinationName()}
-            className="w-full h-[220px] object-cover transition-transform duration-300 hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105 rounded-2xl"
             onError={(e) => {
               // Hide the broken image and show placeholder div
               e.target.style.display = 'none';
@@ -117,51 +117,61 @@ const RecommendationCard = ({ recommendation }) => {
           />
         ) : null}
         
-        {/* Placeholder div - shown when no image URL or when image fails to load */}
+        {/* Placeholder div */}
         <div 
-          className={`w-full h-[220px] bg-gradient-to-br from-[#3A59D1] to-[#2d47b8] ${imageUrl ? 'hidden' : 'flex'} items-center justify-center text-white`}
+          className={`absolute inset-0 w-full h-full bg-gradient-to-br from-[#3A59D1] to-[#2d47b8] ${imageUrl ? 'hidden' : 'flex'} items-center justify-center text-white`}
           style={{ display: imageUrl ? 'none' : 'flex' }}
         >
           <div className="text-center">
-            <div className="text-4xl mb-2">🏖️</div>
+            <div className="text-3xl mb-2">🏖️</div>
             <div className="text-sm font-medium">Gambar Tidak Tersedia</div>
           </div>
         </div>
 
         {/* Kategori Badge */}
         {recommendation.kategori && (
-          <div className="absolute top-3 left-3">
+          <div className="absolute top-3 left-3 z-10">
             <span className="inline-block bg-[#3A59D1] bg-opacity-90 text-white text-xs px-3 py-1 rounded-full font-medium backdrop-blur-sm">
               {recommendation.kategori}
             </span>
           </div>
         )}
+        
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
       </div>
 
-      {/* Content Container */}
-      <div className="p-5">
-        {/* Nama Wisata */}
-        <h3 className="text-lg font-bold font-poppins text-gray-900 mb-2 line-clamp-2 leading-tight min-h-[3.5rem]">
-          {getDestinationName()}
-        </h3>
+      {/* Content Container - Tinggi tetap dengan padding konsisten */}
+      <div className="p-5 flex-1 flex flex-col justify-between min-h-[180px]">
+        {/* Top Content */}
+        <div className="flex-1">
+          {/* Nama Wisata */}
+          <div className="mb-3">
+            <h3 className="text-lg font-bold font-poppins text-gray-900 leading-tight line-clamp-2">
+              {getDestinationName()}
+            </h3>
+          </div>
 
-        {/* Alamat */}
-        <div className="flex items-start gap-2 mb-4">
-          <span className="text-[#3A59D1] text-sm mt-0.5 flex-shrink-0">📍</span>
-          <p className="text-sm text-gray-600 font-poppins line-clamp-2 leading-relaxed">
-            {getDestinationAddress()}
-          </p>
+          {/* Alamat */}
+          <div className="mb-4">
+            <div className="flex items-start gap-2">
+              <span className="text-[#3A59D1] text-sm mt-0.5 flex-shrink-0">📍</span>
+              <p className="text-sm text-gray-600 font-poppins leading-relaxed line-clamp-2">
+                {getDestinationAddress()}
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Button Selengkapnya */}
-        <button 
-          onClick={handleDetailClick}
-          className="w-full bg-[#3A59D1] text-white text-sm font-semibold py-3 px-4 rounded-xl hover:bg-[#2d47b8] active:bg-[#1e3a8a] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#3A59D1] focus:ring-opacity-50"
-        >
-          Lihat Selengkapnya
-        </button>
+        {/* Button Selengkapnya - Selalu di bagian bawah */}
+        <div className="mt-auto">
+          <button 
+            onClick={handleDetailClick}
+            className="w-full bg-[#3A59D1] text-white text-sm font-semibold py-3 px-4 rounded-xl hover:bg-[#2d47b8] active:bg-[#1e3a8a] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#3A59D1] focus:ring-opacity-50"
+          >
+            Lihat Selengkapnya
+          </button>
+        </div>
       </div>
     </div>
   );

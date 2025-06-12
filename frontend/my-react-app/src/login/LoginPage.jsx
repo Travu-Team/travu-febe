@@ -27,10 +27,94 @@ const LoginPage = () => {
     setShowPassword(!showPassword);
   };
 
+  const getSpecificErrorMessage = (error) => {
+    // Jika error memiliki status code atau response data
+    if (error.response) {
+      const status = error.response.status;
+      const data = error.response.data;
+      
+      switch (status) {
+        case 400:
+          if (data.message?.toLowerCase().includes('password')) {
+            return "Password yang Anda masukkan salah. Silakan coba lagi.";
+          }
+          if (data.message?.toLowerCase().includes('email')) {
+            return "Email tidak ditemukan. Pastikan email Anda benar.";
+          }
+          return "Data yang Anda masukkan tidak valid. Periksa kembali email dan password.";
+        
+        case 401:
+          return "Email atau password salah. Silakan periksa kembali.";
+        
+        case 403:
+          return "Akun Anda tidak memiliki akses. Hubungi administrator.";
+        
+        case 404:
+          return "Email tidak terdaftar. Silakan daftar terlebih dahulu.";
+        
+        case 429:
+          return "Terlalu banyak percobaan login. Silakan tunggu beberapa menit.";
+        
+        case 500:
+          return "Terjadi kesalahan pada server. Silakan coba lagi nanti.";
+        
+        default:
+          return data.message || "Terjadi kesalahan saat login.";
+      }
+    }
+    
+    // Jika error berdasarkan message string
+    if (error.message) {
+      const message = error.message.toLowerCase();
+      
+      if (message.includes('password')) {
+        return "Password yang Anda masukkan salah.";
+      }
+      if (message.includes('email')) {
+        return "Email tidak ditemukan atau format email salah.";
+      }
+      if (message.includes('network') || message.includes('fetch')) {
+        return "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.";
+      }
+      if (message.includes('invalid credentials')) {
+        return "Email atau password salah.";
+      }
+      if (message.includes('user not found')) {
+        return "Email tidak terdaftar di sistem.";
+      }
+      if (message.includes('incorrect password')) {
+        return "Password yang Anda masukkan salah.";
+      }
+    }
+    
+    return "Terjadi kesalahan saat login. Silakan coba lagi.";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
     setIsLoading(true);
+
+    // Validasi form sebelum submit
+    if (!formData.email.trim()) {
+      setErrorMessage("Email tidak boleh kosong.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!formData.password.trim()) {
+      setErrorMessage("Password tidak boleh kosong.");
+      setIsLoading(false);
+      return;
+    }
+
+    // Validasi format email sederhana
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setErrorMessage("Format email tidak valid.");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const response = await authService.login({
@@ -43,10 +127,11 @@ const LoginPage = () => {
         // Token akan disimpan oleh authService berdasarkan rememberMe
         navigate("/");
       } else {
-        setErrorMessage("Login gagal, periksa kembali email dan password.");
+        setErrorMessage("Login gagal. Email atau password salah.");
       }
     } catch (error) {
-      setErrorMessage(error.message || "Terjadi kesalahan saat login.");
+      const specificError = getSpecificErrorMessage(error);
+      setErrorMessage(specificError);
       console.error("Login error:", error);
     } finally {
       setIsLoading(false);
@@ -74,9 +159,11 @@ const LoginPage = () => {
 
           {/* Pesan Kesalahan */}
           {errorMessage && (
-            <p className="text-red-500 text-sm text-center mt-2">
-              {errorMessage}
-            </p>
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-red-600 text-sm text-center font-medium">
+                {errorMessage}
+              </p>
+            </div>
           )}
 
           {/* Form */}

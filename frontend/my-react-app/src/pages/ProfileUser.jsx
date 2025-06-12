@@ -441,7 +441,7 @@ useEffect(() => {
                   { value: "Jawa Barat", label: "Jawa Barat" },
                   { value: "Banten", label: "Banten" },
                   { value: "Jawa Tengah", label: "Jawa Tengah" },
-                  { value: "Daerah Istimewa Yogyakarta", label: "Yogyakarta" },
+                  { value: "DI Yogyakarta", label: "DI Yogyakarta" },
                   { value: "Jawa Timur", label: "Jawa Timur" },
                   { value: "Bali", label: "Bali" },
                   {
