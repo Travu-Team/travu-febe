@@ -19,9 +19,9 @@ NOTE: HARAP DIPERHATIKAN UNTUK SELALU PULL REPOSITORY TERLEBIH DAHULU SEBELUM ME
 
 - [x] Autentikasi login & register (Yunas & Luthfi)
 - [x] CRUD laman profile user (Luthfi)
-- [x] CRUD laman travel details (Yunas)
+- [x] Integrasi backend ke laman travel details (Yunas)
 - [x] CRUD laman travel plan (Luthfi)
-- [x] Integrasi Backend to ML (Yunas)
+- [x] Integrasi ML ke Backend (Yunas)
 
 ## HOW TO CLONE REPOSITORY
 
