@@ -127,7 +127,7 @@ const TravelPlanForm = ({ visible, onClose, editingPlan }) => {
   }, [selectedProvince, selectedCategory, wisataData]);
 
   // Fungsi untuk menyimpan ke IndexedDB 
-  const saveTravelPlan = async (data) => {
+  const simpanKeIndexedDB = async (data) => {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open('travelPlanDB', 2);
 
@@ -242,13 +242,16 @@ const TravelPlanForm = ({ visible, onClose, editingPlan }) => {
         destinations: travelPlan.items
       };
 
-      await saveTravelPlan(dataToSave);
+      await simpanKeIndexedDB(dataToSave);
       toast.success(editingPlan ? 'Rencana anda berhasil diperbarui!' : 'Rencana anda berhasil disimpan!');
-      onClose(true);
+      // Give toast a moment to show before closing
+      setTimeout(() => {
+        setIsSubmitting(false);
+        onClose(true);
+      }, 1000);
     } catch (error) {
       console.error('Error saving travel plan:', error);
       toast.error('Terjadi kesalahan saat menyimpan data. Silakan coba lagi.');
-    } finally {
       setIsSubmitting(false);
     }
   };
