@@ -280,7 +280,7 @@ const RekomendasiSection = () => {
   }
 
   return (
-    <div className="w-full flex flex-col items-center gap-6 px-4 md:px-8 lg:px-20 py-10">
+    <div className="w-full flex flex-col items-center gap-6 px-4 md:px-8 lg:px-20 py-10" id="recommendations-section">
       {/* Header */}
       <div className="w-full max-w-screen-xl">
         <h2 className="text-[#3A59D1] text-2xl md:text-3xl lg:text-4xl font-semibold font-poppins mb-4">

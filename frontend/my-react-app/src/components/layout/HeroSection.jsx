@@ -1,6 +1,28 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
+  const handleScrollToRecommendations = () => {
+    navigate("/", { state: { scrollToRecommendations: true } });
+    const recommendationsSection = document.getElementById("recommendations-section");
+    if (recommendationsSection) {
+      const offsetY = 50; // Jarak offset dari top element (dalam pixel)
+      const elementPosition = recommendationsSection.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offsetY;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+        options: {
+          duration: 9000, // Durasi scroll dalam milidetik
+          easing: 'easeInOutQuad' 
+        }
+      });
+    }
+  };
+
   return (
     <div
       className="w-full min-h-screen flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat text-left text-base sm:text-[20px] lg:text-[24px] text-[#3a59d1] font-poppins relative overflow-hidden"
@@ -61,8 +83,11 @@ const HeroSection = () => {
             </div>
 
             {/* Button */}
-            <button className="bg-[#3a59d1] text-white text-lg lg:text-[20px] font-semibold py-3 lg:py-[15px] px-6 lg:px-[24px] rounded-[14px] shadow-md hover:brightness-110 hover:scale-105 transition-transform duration-300 relative overflow-hidden group mt-4">
-              <span className="relative z-10">Lihat Selengkapnya</span>
+            <button
+              onClick={handleScrollToRecommendations}
+              className="bg-[#3a59d1] text-white text-lg lg:text-[20px] font-semibold py-3 lg:py-[15px] px-6 lg:px-[24px] rounded-[14px] shadow-md hover:brightness-110 hover:scale-105 transition-transform duration-300 relative overflow-hidden group mt-4"
+            >
+              <span className="relative z-10">Rekomendasi Wisata</span>
               <div className="absolute inset-0 bg-white/10 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
             </button>
           </div>
