@@ -127,7 +127,7 @@ const TravelPlanForm = ({ visible, onClose, editingPlan }) => {
   }, [selectedProvince, selectedCategory, wisataData]);
 
   // Fungsi untuk menyimpan ke IndexedDB 
-  const simpanKeIndexedDB = async (data) => {
+  const saveTravelPlan = async (data) => {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open('travelPlanDB', 2);
 
@@ -136,18 +136,6 @@ const TravelPlanForm = ({ visible, onClose, editingPlan }) => {
         reject(event.target.error);
       };
 
-      request.onupgradeneeded = (event) => {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains('rencanaWisata')) {
-          const store = db.createObjectStore('rencanaWisata', { 
-            keyPath: 'id', 
-            autoIncrement: true 
-          });
-          store.createIndex('planName', 'planName', { unique: false });
-          store.createIndex('travelDate', 'travelDate', { unique: false });
-        }
-      };
-      
       request.onsuccess = (event) => {
         const db = event.target.result;
         try {
@@ -159,14 +147,22 @@ const TravelPlanForm = ({ visible, onClose, editingPlan }) => {
             planName: data.planName,
             travelDate: data.travelDate,
             destinations: data.destinations || [],
-            createdAt: new Date().toISOString(),
+            createdAt: data.id ? data.createdAt : new Date().toISOString(),
             updatedAt: new Date().toISOString()
           };
 
-          const addRequest = store.add(dataToSave);
+          let operation;
+          if (data.id) {
+            // Update existing record
+            dataToSave.id = data.id;
+            operation = store.put(dataToSave);
+          } else {
+            // Create new record
+            operation = store.add(dataToSave);
+          }
 
-          addRequest.onsuccess = () => resolve(addRequest.result);
-          addRequest.onerror = (error) => reject(error);
+          operation.onsuccess = () => resolve(operation.result);
+          operation.onerror = (error) => reject(error);
 
           transaction.oncomplete = () => db.close();
         } catch (error) {
@@ -237,13 +233,16 @@ const TravelPlanForm = ({ visible, onClose, editingPlan }) => {
     
     try {
       const dataToSave = {
-        ...(editingPlan?.id ? { id: editingPlan.id } : {}),
+        ...(editingPlan?.id ? { 
+          id: editingPlan.id,
+          createdAt: editingPlan.createdAt 
+        } : {}),
         planName: travelPlan.name.trim(),
         travelDate: travelPlan.date,
         destinations: travelPlan.items
       };
 
-      await simpanKeIndexedDB(dataToSave);
+      await saveTravelPlan(dataToSave);
       toast.success(editingPlan ? 'Rencana anda berhasil diperbarui!' : 'Rencana anda berhasil disimpan!');
       onClose(true);
     } catch (error) {
