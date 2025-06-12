@@ -27,7 +27,7 @@ const Navbar = () => {
           email: decoded.email || "",
           nickname: decoded.nickname || "",
         });
-        
+
         // Fetch full profile data from API
         fetchUserProfile();
       } catch (error) {
@@ -43,9 +43,9 @@ const Navbar = () => {
     try {
       setIsLoadingProfile(true);
       const response = await apiClient.get(API_CONFIG.ENDPOINTS.PROFILE);
-      
+
       if (response.success && response.data) {
-        setUser(prevUser => ({
+        setUser((prevUser) => ({
           ...prevUser,
           username: response.data.name || response.data.username || "User",
           nickname: response.data.nickname || "",
@@ -67,7 +67,7 @@ const Navbar = () => {
   };
 
   const getInitials = (name) => {
-    if (!name || typeof name !== 'string') return "U";
+    if (!name || typeof name !== "string") return "U";
     const names = name.trim().split(" ");
     if (names.length === 1) return names[0][0].toUpperCase();
     return (names[0][0] + names[names.length - 1][0]).toUpperCase();
@@ -76,16 +76,16 @@ const Navbar = () => {
   // Get display name prioritizing nickname
   const getDisplayName = (user) => {
     if (!user) return "User";
-    
+
     // Prioritize nickname if available, otherwise use first name from username
     if (user.nickname && user.nickname.trim()) {
       return user.nickname.trim();
     }
-    
-    if (user.username && typeof user.username === 'string') {
+
+    if (user.username && typeof user.username === "string") {
       return user.username.trim().split(" ")[0];
     }
-    
+
     return "User";
   };
 
@@ -98,7 +98,7 @@ const Navbar = () => {
   };
 
   // Handle protected navigation
-  const handleProtectedNavigation = (e, path) => {
+  const handleProtectedNavigation = (e) => {
     if (!user) {
       e.preventDefault();
       alert("Silakan login terlebih dahulu untuk mengakses halaman ini");
@@ -110,7 +110,10 @@ const Navbar = () => {
     <nav className="w-full bg-white h-[60px] shadow-md z-50 relative">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-full">
         {/* Logo */}
-        <a href="/" className="flex items-center text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-blue-600 mb-1 transition-all duration-300 hover:text-transparent hover:bg-[conic-gradient(from_256.62deg_at_50%_50%,#47bb8e_-33.72deg,#3a59d1_241.19deg,#47bb8e_326.28deg,#3a59d1_601.19deg)] hover:bg-clip-text">
+        <a
+          href="/"
+          className="flex items-center text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-blue-600 mb-1 transition-all duration-300 hover:text-transparent hover:bg-[conic-gradient(from_256.62deg_at_50%_50%,#47bb8e_-33.72deg,#3a59d1_241.19deg,#47bb8e_326.28deg,#3a59d1_601.19deg)] hover:bg-clip-text"
+        >
           TRAVU
         </a>
 
@@ -126,19 +129,23 @@ const Navbar = () => {
           </a>
           <a
             href="/about"
-            onClick={!user ? (e) => handleProtectedNavigation(e, "/about") : undefined}
+            onClick={!user ? (e) => handleProtectedNavigation(e) : undefined}
             className={`text-[#6a7bd9] ${
               window.location.pathname === "/about" ? "font-bold" : ""
-            } ${!user ? "opacity-50 cursor-not-allowed" : ""} hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
+            } ${
+              !user ? "opacity-50 cursor-not-allowed" : ""
+            } hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
           >
             Tentang Kami
           </a>
           <a
             href="/plan"
-            onClick={!user ? (e) => handleProtectedNavigation(e, "/plan") : undefined}
+            onClick={!user ? (e) => handleProtectedNavigation(e) : undefined}
             className={`text-[#6a7bd9] ${
               window.location.pathname === "/plan" ? "font-bold" : ""
-            } ${!user ? "opacity-50 cursor-not-allowed" : ""} hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
+            } ${
+              !user ? "opacity-50 cursor-not-allowed" : ""
+            } hover:no-underline hover:[text-shadow:1px_1px_0px_rgba(0,0,0,0.1)]`}
           >
             Rencana Wisata
           </a>
@@ -162,7 +169,9 @@ const Navbar = () => {
                     className="w-full h-full rounded-full"
                   />
                 </div>
-                {isLoadingProfile ? "Loading..." : `Hai, ${getDisplayName(user)}!`}
+                {isLoadingProfile
+                  ? "Loading..."
+                  : `Hai, ${getDisplayName(user)}!`}
               </button>
 
               {isProfileDropdownOpen && (
@@ -220,7 +229,9 @@ const Navbar = () => {
                 aria-expanded={isProfileDropdownOpen}
                 disabled={isLoadingProfile}
               >
-                {isLoadingProfile ? "..." : getInitials(user.nickname || user.username)}
+                {isLoadingProfile
+                  ? "..."
+                  : getInitials(user.nickname || user.username)}
               </button>
 
               {isProfileDropdownOpen && (
@@ -235,9 +246,9 @@ const Navbar = () => {
                   <li>
                     <a
                       href="/profile"
-                      className="w-full text-left block px-4 py-3 text-gray-900 hover:bg-gray-200"
+                      className="all-[unset] block w-full px-4 py-3 text-left text-gray-800 hover:bg-gray-200 hover:text-gray-800 font-normal cursor-pointer"
                     >
-                      Settings
+                      Pengaturan
                     </a>
                   </li>
                   <li>
@@ -245,7 +256,7 @@ const Navbar = () => {
                       onClick={handleLogout}
                       className="w-full text-left block px-4 py-3 text-gray-900 hover:bg-gray-200"
                     >
-                      Sign Out
+                      Keluar
                     </button>
                   </li>
                 </ul>
@@ -320,8 +331,14 @@ const Navbar = () => {
             <li>
               <a
                 href="/about"
-                onClick={!user ? (e) => handleProtectedNavigation(e, "/about") : undefined}
-                className={`block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded ${!user ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={
+                  !user
+                    ? (e) => handleProtectedNavigation(e, "/about")
+                    : undefined
+                }
+                className={`block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded ${
+                  !user ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 Tentang Kami
               </a>
@@ -329,8 +346,14 @@ const Navbar = () => {
             <li>
               <a
                 href="/plan"
-                onClick={!user ? (e) => handleProtectedNavigation(e, "/plan") : undefined}
-                className={`block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded ${!user ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={
+                  !user
+                    ? (e) => handleProtectedNavigation(e, "/plan")
+                    : undefined
+                }
+                className={`block py-2 px-3 text-[#3a59d1] hover:bg-gray-100 rounded ${
+                  !user ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 Rencana Wisata
               </a>

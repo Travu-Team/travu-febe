@@ -22,7 +22,13 @@ const dataGambar = {
     "/image/air-terjun-aling-aling.jpg",
     "/image/Air-Terjun-Mangku-Sakti.jpg",
   ],
-  Lainnya: ["/image/candi1.jpg", "/image/candi2.jpg", "/image/candi3.jpg","/image/candi4.jpg","image/candi5.jpg"]
+  Lainnya: [
+    "/image/candi1.jpg",
+    "/image/candi2.jpg",
+    "/image/candi3.jpg",
+    "/image/candi4.jpg",
+    "image/candi5.jpg",
+  ],
 };
 
 // Buat kategori "Semua" dari gabungan semua
@@ -174,11 +180,6 @@ const KategoriSection = () => {
           </div>
         </div>
       )}
-
-      {/* Lihat selengkapnya */}
-      <div className="text-blue-600 underline text-sm md:text-base text-center mt-8 cursor-pointer hover:text-blue-800 transition-colors">
-        Lihat selengkapnya &gt;&gt;
-      </div>
     </div>
   );
 };

@@ -156,14 +156,14 @@ const Footer = () => {
                   melalui email kami.
                 </p>
                 <a
-                  href="https://www.instagram.com/dicoding/"
+                  href=""
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center px-4 py-2 bg-pink-600 text-white hover:text-white focus:text-white visited:text-white                  
                   text-xs font-medium rounded-md transition-transform duration-200 transform hover:scale-105"
                 >
                   <FontAwesomeIcon icon={faInstagram} className="mr-2" />
-                  Follow @dicoding
+                  Follow @Travuu
                 </a>
               </div>
             </div>

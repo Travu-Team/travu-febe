@@ -75,21 +75,24 @@ const DestinasiDetail = () => {
   if (!detail) {
     return (
       <>
-        <Navbar />
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
-          <div className="text-center">
-            <h2 className="text-red-600 text-2xl font-bold">
-              Data tidak ditemukan!
-            </h2>
-            <p className="text-gray-600">
-              Pastikan URL sudah benar atau coba kembali nanti.
-            </p>
-            <p className="text-sm text-gray-500 mt-2">
-              Mencari: {decodeURIComponent(placeName)}
-            </p>
+        <div className="min-h-screen w-full bg-[#FDFDFD]">
+          <Navbar />
+          <div className="flex justify-center items-center min-h-screen bg-gray-100">
+            <div className="text-center">
+              <h2 className="text-red-600 text-2xl font-bold">
+                Data tidak ditemukan!
+              </h2>
+              <p className="text-gray-600">
+                Pastikan URL sudah benar atau coba kembali nanti.
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                Mencari: {decodeURIComponent(placeName)}
+              </p>
+            </div>
           </div>
+          <Footer />
         </div>
-        <Footer />
+
       </>
     );
   }
@@ -127,6 +130,7 @@ const DestinasiDetail = () => {
 
   return (
     <>
+    <div className="min-h-screen w-full bg-[#FDFDFD]">
       <Navbar />
       <main className="p-6 max-w-full mx-auto bg-white rounded-xl shadow-md my-6 min-h-screen">
         {/* Gambar dan Info */}
@@ -221,6 +225,7 @@ const DestinasiDetail = () => {
         )}
       </main>
       <Footer />
+      </div>
     </>
   );
 };
