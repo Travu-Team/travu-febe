@@ -1,5 +1,5 @@
 # Menambahkan folder service agar tidak terdeploy
-src/services
+src/services/
 .env
 netlyfy.toml
 netlyfy/function
